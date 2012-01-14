@@ -125,8 +125,8 @@ public class ToDoActivity extends Activity {
 					@Override
 					protected Object doInBackground(Void... params) {
 						try {
-							Thread.sleep(3000);
-							if(textInput1Value.equals("w@x.m") && textInput2Value.equals("123456")) {
+							Thread.sleep(1500);
+							if(textInput1Value.equals("t@t.t") && textInput2Value.equals("123456")) {
 								startActivity(new Intent(ToDoActivity.this, ToDoListActivity.class));
 								correctLogIn = true;
 //							} else {

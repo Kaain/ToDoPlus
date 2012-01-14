@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, ToDoActivity!</string>
-    <string name="app_name">ToDo</string>
+    <string name="app_name">ToDoPlus</string>
     
     <string-array name="todo">
         <item>todo2</item>
