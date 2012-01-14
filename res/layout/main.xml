@@ -6,7 +6,7 @@
 
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/errorField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="false"
@@ -14,7 +14,7 @@
         android:textColor="@color/red" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/mailField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
@@ -26,7 +26,7 @@
     </EditText>
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/passwordField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
@@ -37,7 +37,7 @@
         android:singleLine="true" />
 
     <Button
-        android:id="@+id/login"
+        android:id="@+id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login" />
