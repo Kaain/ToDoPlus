@@ -10,8 +10,12 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
+            android:label="ToDoList"
+            android:name=".ToDoListActivity">
+            <!--  
             android:label="ToDoDetails"
             android:name=".ToDoDetailsActivity">
+            -->
             <!--  android:label="@string/app_name_login"
             android:name=".LoginActivity" >
             -->

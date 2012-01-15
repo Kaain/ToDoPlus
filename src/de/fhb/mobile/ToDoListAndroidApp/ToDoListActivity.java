@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -35,6 +38,35 @@ public class ToDoListActivity extends Activity {
         
         // setze den Adapter auf die Listenansicht
         listview.setAdapter(adapter);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+    
+    @Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		MenuItem allTodosItem = menu.findItem(R.id.all_todos);
+		allTodosItem.setEnabled(false);
+		return true;
+	}
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.all_todos:
+        	//TODO
+            return true;
+        case R.id.contacts:
+        	//TODO
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
     
     private class TodoAdapter extends ArrayAdapter<String> {

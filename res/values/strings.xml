@@ -6,11 +6,15 @@
     <string name="app_name_login">ToDoPlus Login</string>
     <string name="hint_todoname">Name of Todo</string>
     <string name="ok">OK</string>
+    <string name="all_todos">Todos</string>
+    <string name="contacts">Contacts</string>
+    <string name="help">Help</string>
     
     <string-array name="todo">
         <item>todo2</item>
         <item>todo3</item>
         <item>todo1</item>
     </string-array>
+        <string name="newTodo">New Todo</string>
 
 </resources>

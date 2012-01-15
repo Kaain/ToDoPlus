@@ -4,15 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <EditText
-        android:id="@+id/editText1"
+
+    <Button
+        android:id="@+id/newTodoButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="New ToDo" >
-
-        <requestFocus />
-    </EditText>
+        android:text="@string/newTodo" />
 
     <ListView
         android:id="@+id/listView"
@@ -22,5 +19,7 @@
         <!-- Preview: listitem=@layout/listelement -->
 
     </ListView>
+    
+        
 
 </LinearLayout>
