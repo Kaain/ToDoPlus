@@ -33,8 +33,8 @@ public class LoginActivity extends Activity {
 	private boolean correctLogIn = false;
 	
 	// validitiy of editText1 and editText2
-	boolean validMailInput = true;
-	boolean validPasswordInput = true;
+	private boolean validMailInput = true;
+	private boolean validPasswordInput = true;
 	
     /** Called when the activity is first created. */
     @Override
@@ -42,14 +42,13 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         
         // set the list view as content view
-        setContentView(R.layout.main);
+        setContentView(R.layout.login);
         
         // init the ui elements
         errorField = (TextView)findViewById(R.id.errorField);
         initMailField();
         initPasswordField();
         initLoginButton();
-        
     }
     
     private void initMailField(){
