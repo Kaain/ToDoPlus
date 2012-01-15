@@ -143,6 +143,7 @@ public class LoginActivity extends Activity {
 						try {
 							Thread.sleep(1500);
 							if(mailInputValue.equals("t@t.t") && passwordInputValue.equals("123456")) {
+								loadTodos();
 								startActivity(new Intent(LoginActivity.this, ToDoListActivity.class));
 								correctLogIn = true;
 							}
@@ -165,6 +166,10 @@ public class LoginActivity extends Activity {
 				}.execute();
 			}
 		});
+    }
+    
+    private void loadTodos(){
+    	//TODO
     }
     
     private void processMailInput(String text) {

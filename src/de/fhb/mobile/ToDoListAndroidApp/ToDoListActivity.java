@@ -3,6 +3,7 @@ package de.fhb.mobile.ToDoListAndroidApp;
 import de.fhb.mobile.ToDoListAndroidApp.R;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +51,8 @@ public class ToDoListActivity extends Activity {
     		txt.setOnClickListener(new OnClickListener() {
     			@Override
     			public void onClick(View v) {
-    				Toast.makeText(ToDoListActivity.this, "Todo " + position, Toast.LENGTH_LONG).show();
+    				//Toast.makeText(ToDoListActivity.this, "Todo " + position, Toast.LENGTH_LONG).show();
+    				startActivity(new Intent(ToDoListActivity.this, ToDoDetailsActivity.class));
     			}
     		});
     		return v;
