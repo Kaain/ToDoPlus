@@ -1,6 +1,10 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.fhb.mobile.ToDoListAndroidApp.R;
+import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ToDoListActivity extends Activity {
+	
+	private List<Todo> todos;
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,13 +35,14 @@ public class ToDoListActivity extends Activity {
         ListView listview = (ListView)findViewById(R.id.listView);
         
         // lies die Optionen aus
-        final String[] options = getResources().getStringArray(R.array.todo);
+        initTodos();
+        //final String[] options = getResources().getStringArray(R.array.todo);
         
         /**
          * erzeuge einen Adapter, der dem listview Zugriff auf die Inhalte ermöglicht
          * Diesem wird außerdem die Ansicht übermittelt, die für ein einzelnes Listenelement verwendet werden soll
          */
-        ArrayAdapter<String> adapter = new TodoAdapter(this,R.layout.listelement,options);
+        ArrayAdapter<Todo> adapter = new TodoAdapter(this,R.layout.listelement,todos);
         
         // setze den Adapter auf die Listenansicht
         listview.setAdapter(adapter);
@@ -69,8 +77,8 @@ public class ToDoListActivity extends Activity {
         }
     }
     
-    private class TodoAdapter extends ArrayAdapter<String> {
-    	public TodoAdapter(Context context, int textViewResourceId, String[] todos) {
+    private class TodoAdapter extends ArrayAdapter<Todo> {
+    	public TodoAdapter(Context context, int textViewResourceId, List<Todo> todos) {
     		super(context, textViewResourceId, todos);
     	}
     	
@@ -88,6 +96,15 @@ public class ToDoListActivity extends Activity {
     			}
     		});
     		return v;
+    	}
+    }
+    
+    private void initTodos(){
+    	todos = new ArrayList<Todo>();
+    	for(int i=0;i<11;i++){
+    		Todo newTodo = new Todo(i);
+    		newTodo.setName("Name "+ i);
+    		todos.add(newTodo);
     	}
     }
 }
