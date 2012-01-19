@@ -1,23 +1,41 @@
 package de.fhb.mobile.ToDoListAndroidApp.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 import android.provider.ContactsContract;
 import android.text.format.DateFormat;
 
-public class Todo {
+public class Todo implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -13463587883686746L;
 	private long id;
 	private String name;
 	private String description;
 	private boolean finished;
 	private boolean favorite;
-	private Date datetime;
-	private List<Long> contacts;
+	private Date expireDate;
+	private String contacts;
 	
 	public Todo(long id) {
 		this.id = id;
 	}
+	
+	public Todo(long id, String name, String description, boolean finished,
+			boolean favorite, Date expireDate, String contacts) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.finished = finished;
+		this.favorite = favorite;
+		this.expireDate = expireDate;
+		this.contacts = contacts;
+	}
+
 	public Todo() {
 
 	}
@@ -52,17 +70,22 @@ public class Todo {
 	public void setFavorite(boolean favorite) {
 		this.favorite = favorite;
 	}
-	public Date getDatetime() {
-		return datetime;
+	
+	public Date getExpireDate() {
+		return expireDate;
 	}
-	public void setDatetime(Date datetime) {
-		this.datetime = datetime;
+	public void setExpireDate(Date expireDate) {
+		this.expireDate = expireDate;
 	}
-	public List<Long> getContacts() {
+	public String getContacts() {
 		return contacts;
 	}
-	public void setContacts(List<Long> contacts) {
+	public void setContacts(String contacts) {
 		this.contacts = contacts;
+	}
+	@Override
+	public String toString(){
+		return this.getName();
 	}
 	
 }

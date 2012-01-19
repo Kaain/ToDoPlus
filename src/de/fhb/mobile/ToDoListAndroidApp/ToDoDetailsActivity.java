@@ -5,6 +5,8 @@ import java.util.List;
 
 import cz.destil.settleup.gui.MultiSpinner;
 import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
+import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 public class ToDoDetailsActivity extends Activity{
 	
 	private List<String> allContacts;
+	private TodoDatabase database;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState){
@@ -21,6 +24,15 @@ public class ToDoDetailsActivity extends Activity{
         // set the list view as content view
         setContentView(R.layout.details);
         Log.i(this.getClass().getName(), "setContentView(R.layout.details)");
+        
+        database = new TodoDatabase(this);
+		database.open();
+		
+		long todoID = getIntent().getLongExtra(ToDoListActivity.ARG_TODO_ID, -1);
+        
+        Todo todo = database.getTodoById(todoID);
+        Log.i(this.getClass().toString(), todo.toString());
+        
         allContacts = new ArrayList<String>();
         allContacts.add("Contacts1");
         allContacts.add("Contacts2");

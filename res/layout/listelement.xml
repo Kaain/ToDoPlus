@@ -3,28 +3,42 @@
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
     <CheckBox
-        android:id="@+id/doneCheckbox"
+        android:id="@+id/finishedCheckbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
 
     <CheckBox
-        android:id="@+id/starCheckbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/doneCheckbox"
-        android:layout_toRightOf="@+id/doneCheckbox"
-        android:button="@drawable/starbutton" />
+        android:id="@+id/favoriteCheckbox"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignBaseline="@+id/finishedCheckbox"
+        android:layout_alignBottom="@+id/finishedCheckbox"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/finishedCheckbox"
+        android:button="@drawable/starbutton"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
 
     <TextView
         android:id="@+id/todoNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/starCheckbox"
-        android:layout_toRightOf="@+id/starCheckbox"
-        android:text="TextView" />
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="14dp"
+        android:layout_toRightOf="@+id/favoriteCheckbox"
+        android:text="TextView"
+        android:textSize="24dp" />
 
+    <TextView
+        android:id="@+id/hiddenId"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="0dp"
+        android:visibility="invisible" />
+    
 </RelativeLayout>
