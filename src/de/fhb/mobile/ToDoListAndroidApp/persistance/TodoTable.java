@@ -22,7 +22,7 @@ public class TodoTable {
 			+ KEY_DESCRIPTION +	" TEXT, "
 			+ KEY_FINISHED + " INTEGER, "
 			+ KEY_FAVORITE + " INTEGER, "
-			+ KEY_EXPIREDATE + " INTEGER, " 
+			+ KEY_EXPIREDATE + " TEXT, " 
 			+ KEY_CONTACTS + " TEXT" 
 			+ ");";
 	

@@ -1,9 +1,12 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import de.fhb.mobile.ToDoListAndroidApp.R;
+import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateExeption;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
@@ -47,27 +50,19 @@ public class ToDoListActivity extends ListActivity {
         // Zugriff auf die Listenansicht
         ListView listview = (ListView)findViewById(android.R.id.list);
         initTodos();
-        // lies die Optionen aus
-        //initTodos();
-        //final String[] options = getResources().getStringArray(R.array.todo);
+
         Cursor cursorTodos = db.fetchAllTodos();
          
         // Define the columns of the table
  		// which should be used in the ListView
- 		String[] from = new String[] {  TodoTable.KEY_ID, TodoTable.KEY_FAVORITE, TodoTable.KEY_FINISHED, TodoTable.KEY_NAME};
+ 		String[] from = new String[] {  TodoTable.KEY_ID, TodoTable.KEY_FAVORITE, TodoTable.KEY_FINISHED, TodoTable.KEY_NAME, TodoTable.KEY_EXPIREDATE};
  		// Define the view elements to which the
  		// columns will be mapped
- 		int[] to = new int[] { R.id.hiddenId, R.id.favoriteCheckbox, R.id.finishedCheckbox, R.id.todoNameText };
+ 		int[] to = new int[] { R.id.hiddenId, R.id.favoriteCheckbox, R.id.finishedCheckbox, R.id.todoNameText, R.id.expiredateText };
          
-        /**
-         * erzeuge einen Adapter, der dem listview Zugriff auf die Inhalte ermöglicht
-         * Diesem wird außerdem die Ansicht übermittelt, die für ein einzelnes Listenelement verwendet werden soll
-         */
-        //ArrayAdapter<Todo> adapter = new TodoAdapter(this,R.layout.listelement,todos);
         SimpleCursorAdapter sadapter = new TodoAdapter(this,
 				R.layout.listelement, cursorTodos, from, to);
         // setze den Adapter auf die Listenansicht
-        //listview.setAdapter(sadapter);
         this.setListAdapter(sadapter);
     }
     
@@ -122,6 +117,7 @@ public class ToDoListActivity extends ListActivity {
     	private final int todoNameIndex;
     	private final int favoriteIndex;
     	private final int finishedIndex;
+    	private final int expiredateIndex;
     	private final LayoutInflater mLayoutInflater;
 
     	private final class ViewHolder {
@@ -129,6 +125,7 @@ public class ToDoListActivity extends ListActivity {
     		public CheckBox finishedCheckBox;
     		public CheckBox favoriteCheckBox;
     	    public TextView todoName;
+    	    public TextView expiredate;
     	}
 
 
@@ -142,6 +139,7 @@ public class ToDoListActivity extends ListActivity {
     	    this.todoNameIndex = mCursor.getColumnIndex(TodoTable.KEY_NAME);
     	    this.finishedIndex = mCursor.getColumnIndex(TodoTable.KEY_FINISHED);
     	    this.favoriteIndex = mCursor.getColumnIndex(TodoTable.KEY_FAVORITE);
+    	    this.expiredateIndex = mCursor.getColumnIndex(TodoTable.KEY_EXPIREDATE);
     	    this.mLayoutInflater = LayoutInflater.from(mContext);
 
     	}
@@ -159,6 +157,7 @@ public class ToDoListActivity extends ListActivity {
 		            viewHolder.finishedCheckBox = (CheckBox) convertView.findViewById(R.id.finishedCheckbox);
 		            viewHolder.favoriteCheckBox = (CheckBox) convertView.findViewById(R.id.favoriteCheckbox);
 		            viewHolder.todoName = (TextView) convertView.findViewById(R.id.todoNameText);
+		            viewHolder.expiredate = (TextView) convertView.findViewById(R.id.expiredateText);
 		            convertView.setTag(viewHolder);
 		        }
 		        else {
@@ -168,6 +167,7 @@ public class ToDoListActivity extends ListActivity {
 		        boolean finished = (mCursor.getInt(finishedIndex) > 0) ? true : false;
 		        boolean favorite = (mCursor.getInt(favoriteIndex) > 0) ? true : false;
 		        String name = mCursor.getString(todoNameIndex);
+		        String expiredate = DateHelper.getDateAsString(DateHelper.getCalendarByString((mCursor.getString(expiredateIndex))));
 
 		        //boolean isChecked = ((GlobalVars) mContext.getApplicationContext()).isFriendSelected(fb_id);
 
@@ -175,6 +175,7 @@ public class ToDoListActivity extends ListActivity {
 		        viewHolder.finishedCheckBox.setChecked(finished);
 		        viewHolder.favoriteCheckBox.setChecked(favorite);
 		        viewHolder.todoName.setText(name);
+		        viewHolder.expiredate.setText(expiredate);
 		    }
 		    return convertView;
 		}
@@ -210,6 +211,7 @@ public class ToDoListActivity extends ListActivity {
     	newtodo.setName("testCheckbox");
     	newtodo.setFinished(false);
     	newtodo.setFavorite(false);
+    	newtodo.setExpireDate(GregorianCalendar.getInstance());
     	try {
 			db.createTodo(newtodo);
 		} catch (CreateExeption e) {

@@ -1,8 +1,12 @@
 package de.fhb.mobile.ToDoListAndroidApp.models;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 
 import android.provider.ContactsContract;
 import android.text.format.DateFormat;
@@ -17,7 +21,7 @@ public class Todo implements Serializable{
 	private String description;
 	private boolean finished;
 	private boolean favorite;
-	private Date expireDate;
+	private Calendar expireDate;
 	private String contacts;
 	
 	public Todo(long id) {
@@ -25,7 +29,7 @@ public class Todo implements Serializable{
 	}
 	
 	public Todo(long id, String name, String description, boolean finished,
-			boolean favorite, Date expireDate, String contacts) {
+			boolean favorite, Calendar expireDate, String contacts) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -71,10 +75,13 @@ public class Todo implements Serializable{
 		this.favorite = favorite;
 	}
 	
-	public Date getExpireDate() {
+	public Calendar getExpireDate() {
 		return expireDate;
 	}
-	public void setExpireDate(Date expireDate) {
+	public String getExpireDateAsString(){
+		return DateHelper.getDateAsString(this.expireDate);
+	}
+	public void setExpireDate(Calendar expireDate) {
 		this.expireDate = expireDate;
 	}
 	public String getContacts() {

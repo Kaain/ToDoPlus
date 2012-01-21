@@ -1,6 +1,7 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -41,7 +42,7 @@ public class TestDatabaseActivity extends ListActivity {
 			String description = "description " + i;
 			boolean finished = true;
 			boolean favorite = true;
-			Date expireDate = new Date(System.currentTimeMillis());
+			Calendar expireDate = Calendar.getInstance();
 			String contacts = "contacts " + i;
 			Todo newTodo = new Todo(id, name, description, finished, favorite, expireDate, contacts);
     		todos.add(newTodo);
