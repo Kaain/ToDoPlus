@@ -43,7 +43,7 @@ public class TodoDatabase {
         SQLiteDatabase.releaseMemory();
     }
     
-    public long createTodo(Todo todo) throws CreateExeption{
+    public long createTodo(Todo todo) throws CreateException{
     	Log.i(this.getClass().toString(), "new Todo:" +todo);
     	String name = todo.getName();
     	String description = todo.getDescription();
@@ -54,7 +54,7 @@ public class TodoDatabase {
     	
     	ContentValues values = new ContentValues();
     	if(name==null)
-    		throw new CreateExeption("No Name added");
+    		throw new CreateException("No Name added");
     	else
     		values.put(TodoTable.KEY_NAME, name);
 		

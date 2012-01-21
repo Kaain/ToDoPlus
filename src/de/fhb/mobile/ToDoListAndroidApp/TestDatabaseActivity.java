@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateExeption;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoTable;
 
@@ -48,7 +48,7 @@ public class TestDatabaseActivity extends ListActivity {
     		todos.add(newTodo);
     		try {
 				db.createTodo(todos.get(i));
-			} catch (CreateExeption e) {
+			} catch (CreateException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

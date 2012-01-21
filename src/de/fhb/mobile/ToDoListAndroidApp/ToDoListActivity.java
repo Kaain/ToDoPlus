@@ -8,7 +8,7 @@ import java.util.List;
 import de.fhb.mobile.ToDoListAndroidApp.R;
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateExeption;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoTable;
 import android.app.Activity;
@@ -214,7 +214,7 @@ public class ToDoListActivity extends ListActivity {
     	newtodo.setExpireDate(GregorianCalendar.getInstance());
     	try {
 			db.createTodo(newtodo);
-		} catch (CreateExeption e) {
+		} catch (CreateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
