@@ -39,10 +39,6 @@
             android:label="ToDoDetails"
             android:name=".ToDoDetailsActivity">
         </activity>
-        <activity 
-            android:label="TestDatabase"
-            android:name=".TestDatabaseActivity">
-        </activity>
         <!--  
         <provider
             android:name=".contentprovider.TodoContentProvider"
