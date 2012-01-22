@@ -22,14 +22,14 @@ public class Todo implements Serializable{
 	private boolean finished;
 	private boolean favorite;
 	private Calendar expireDate;
-	private String contacts;
+	private List<Long> contacts;
 	
 	public Todo(long id) {
 		this.id = id;
 	}
 	
 	public Todo(long id, String name, String description, boolean finished,
-			boolean favorite, Calendar expireDate, String contacts) {
+			boolean favorite, Calendar expireDate, List<Long> contacts) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -74,20 +74,19 @@ public class Todo implements Serializable{
 	public void setFavorite(boolean favorite) {
 		this.favorite = favorite;
 	}
-	
 	public Calendar getExpireDate() {
 		return expireDate;
 	}
 	public String getExpireDateAsString(){
-		return DateHelper.getDateAsString(this.expireDate);
+		return DateHelper.getDateTimeAsString(this.expireDate);
 	}
 	public void setExpireDate(Calendar expireDate) {
 		this.expireDate = expireDate;
 	}
-	public String getContacts() {
+	public List<Long> getContacts() {
 		return contacts;
 	}
-	public void setContacts(String contacts) {
+	public void setContacts(List<Long> contacts) {
 		this.contacts = contacts;
 	}
 	@Override

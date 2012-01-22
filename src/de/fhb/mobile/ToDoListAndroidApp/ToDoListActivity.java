@@ -167,7 +167,7 @@ public class ToDoListActivity extends ListActivity {
 		        boolean finished = (mCursor.getInt(finishedIndex) > 0) ? true : false;
 		        boolean favorite = (mCursor.getInt(favoriteIndex) > 0) ? true : false;
 		        String name = mCursor.getString(todoNameIndex);
-		        String expiredate = DateHelper.getDateAsString(DateHelper.getCalendarByString((mCursor.getString(expiredateIndex))));
+		        String expiredate = DateHelper.getDateTimeAsString(DateHelper.getCalendarByString((mCursor.getString(expiredateIndex))));
 
 		        //boolean isChecked = ((GlobalVars) mContext.getApplicationContext()).isFriendSelected(fb_id);
 
@@ -179,39 +179,18 @@ public class ToDoListActivity extends ListActivity {
 		    }
 		    return convertView;
 		}
-
-    	/*
-    	@Override
-		public View getView(final int position, View listItemView, ViewGroup parent) {
-    		LayoutInflater vi = (LayoutInflater) ToDoListActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    		View v = vi.inflate(R.layout.listelement, null);
-    		
-    		TextView txt = (TextView)v.findViewById(R.id.todoNameText);
-    		txt.setOnClickListener(new OnClickListener() {
-    			@Override
-    			public void onClick(View v) {
-    				Log.i(this.getClass().toString(), "onClick");
-    				Toast.makeText(ToDoListActivity.this, "Todo " + position, Toast.LENGTH_LONG).show();
-    				Intent intent = new Intent(ToDoListActivity.this, ToDoDetailsActivity.class);
-    				// pass the item to the intent
-    				intent.putExtra(ARG_TODO_OBJECT, item);
-    				// also specify the accessor class
-    				intent.putExtra(DataAccessActivity.ARG_ACCESSOR_CLASS,
-    						IntentDataItemAccessorImpl.class.getName());
-    				startActivityForResult(intent, REQUEST_CODE_TODODETAILS);
-    				
-    			}
-    		});
-    		return v;
-    	}*/
     }
     
     private void initTodos(){
+    	List<Long> list = new ArrayList<Long>();
+    	list.add(1l);
+    	list.add(2342344l);
     	Todo newtodo = new Todo();
-    	newtodo.setName("testCheckbox");
+    	newtodo.setName("testSth");
     	newtodo.setFinished(false);
-    	newtodo.setFavorite(false);
+    	newtodo.setFavorite(true);
     	newtodo.setExpireDate(GregorianCalendar.getInstance());
+    	newtodo.setContacts(list);
     	try {
 			db.createTodo(newtodo);
 		} catch (CreateException e) {

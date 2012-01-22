@@ -1,12 +1,14 @@
 package de.fhb.mobile.ToDoListAndroidApp.persistance;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
+import de.fhb.mobile.ToDoListAndroidApp.commons.ListHelper;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
 import android.content.ContentValues;
@@ -50,7 +52,7 @@ public class TodoDatabase {
     	boolean finished = todo.isFinished();
     	boolean favorite = todo.isFavorite();
     	Calendar cal = todo.getExpireDate();
-    	String contacts = todo.getContacts();
+    	List<Long> contacts = todo.getContacts();
     	
     	ContentValues values = new ContentValues();
     	if(name==null)
@@ -62,7 +64,7 @@ public class TodoDatabase {
 		values.put(TodoTable.KEY_FINISHED, finished);
 		values.put(TodoTable.KEY_FAVORITE, favorite);
 		values.put(TodoTable.KEY_EXPIREDATE, cal.getTime().toString());
-		values.put(TodoTable.KEY_CONTACTS, (contacts==null) ? "": contacts);
+		values.put(TodoTable.KEY_CONTACTS, (contacts==null) ? "": ListHelper.listToString(contacts));
 		
 		return database.insert(TodoTable.TABLE_TODO, null, values);
     }
@@ -104,7 +106,8 @@ public class TodoDatabase {
     	returnTodo.setFavorite((cursor.getInt(favoriteIndex)>0 ? true : false));
     	returnTodo.setFinished((cursor.getInt(finishedIndex)>0 ? true : false));
     	returnTodo.setExpireDate(DateHelper.getCalendarByString((cursor.getString(expiredateIndex))));
-    	returnTodo.setContacts(cursor.getString(contactsIndex));
+    	String contacts = cursor.getString(contactsIndex);
+    	returnTodo.setContacts(ListHelper.stringToList(contacts));
 		return returnTodo;
     }
 }

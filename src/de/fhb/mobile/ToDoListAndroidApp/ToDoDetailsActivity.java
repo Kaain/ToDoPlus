@@ -7,13 +7,17 @@ import java.util.List;
 
 import cz.destil.settleup.gui.MultiSpinner;
 import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
+import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -184,8 +188,27 @@ public class ToDoDetailsActivity extends Activity{
 		Log.i(this.getClass().toString(), "initActivityforEditTodo ID: " +todoID);
 		actualTodo = database.getTodoById(todoID);	
 		initViewComponents(MODE_EDIT);
+		initData();
 	}
 	
+	private void initData(){
+		detailsName.setText(actualTodo.getName());
+		detailsDescription.setText(actualTodo.getDescription());
+		detailsFavorite.setChecked(actualTodo.isFavorite());
+		detailsFinished.setChecked(actualTodo.isFinished());
+		String date = DateHelper.getDateAsString(actualTodo.getExpireDate());
+		detailsDateValue.setText(date);
+		String time = DateHelper.getTimeAsString(actualTodo.getExpireDate());
+		detailsTimeValue.setText(time);
+		detailsContacts.setItems(getAllContacts(), "All Contacts", false, new MultiSpinnerListener() {
+			
+			@Override
+			public void onItemsSelected(boolean[] selected) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
 	
 	private void initDatePicker(){
 		Calendar cal = GregorianCalendar.getInstance();
@@ -216,5 +239,19 @@ public class ToDoDetailsActivity extends Activity{
 				showDialog(TIME_DIALOG_ID);
 			}
 		});
+	}
+	
+	private List<String> getAllContacts(){
+		List<String> contacts = new ArrayList<String>();
+		Cursor people = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		while(people.moveToNext()) {
+		   int idFieldColumnIndex = people.getColumnIndex(PhoneLookup._ID);
+		   long id = people.getLong(idFieldColumnIndex);
+		   int nameFieldColumnIndex = people.getColumnIndex(PhoneLookup.DISPLAY_NAME);
+		   String name = people.getString(nameFieldColumnIndex);
+		   contacts.add(name);
+		}
+		people.close();
+		return contacts;
 	}
 }

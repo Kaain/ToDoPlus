@@ -88,7 +88,7 @@ public class MultiSpinner extends Spinner implements
         return true;
     }
 
-    public void setItems(List<String> items, String allText,
+    public void setItems(List<String> items, String allText, boolean allSelected,
             MultiSpinnerListener listener) {
         this.items = items;
         this.defaultText = allText;
@@ -97,7 +97,7 @@ public class MultiSpinner extends Spinner implements
         // all selected by default
         selected = new boolean[items.size()];
         for (int i = 0; i < selected.length; i++)
-            selected[i] = true;
+            selected[i] = allSelected;
 
         // all text on the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
