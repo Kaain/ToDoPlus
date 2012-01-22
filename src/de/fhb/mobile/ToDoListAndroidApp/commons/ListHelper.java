@@ -7,11 +7,15 @@ import java.util.List;
 import android.hardware.Camera.Size;
 
 public class ListHelper {
-	public static String listToString(List<Long> list){
-		String string = String.valueOf(list.get(0));
-		for(int i = 1; i < list.size(); i++)
-			string = string + "|" +list.get(i);
-		return string;
+	public static String listToString(List<Long> list) {
+		if (!list.isEmpty()) {
+			String string = String.valueOf(list.get(0));
+			for (int i = 1; i < list.size(); i++)
+				string = string + "|" + list.get(i);
+			return string;
+		} else
+			return "";
+
 	}
 	public static List<Long> stringToList(String string){
 		if(string.isEmpty())

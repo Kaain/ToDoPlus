@@ -20,7 +20,7 @@ public class DateHelper {
 	 * @return the date as string in Format: dd.MM.yyyy, HH:mm
 	 */
 	public static String getDateTimeAsString(Calendar cal){
-		DateFormat format = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
+		DateFormat format = new SimpleDateFormat("MM-dd-yyyy | HH:mm");
 		return format.format(cal.getTime());
 	}
 	
@@ -56,7 +56,7 @@ public class DateHelper {
 	 */
 	public static String parseStringToDateformat(String string){
 		Date date = new Date(string);
-		DateFormat format = new SimpleDateFormat("d.MM.yyyy, HH:mm");
+		DateFormat format = new SimpleDateFormat("MM-dd-yyyy | HH:mm");
 		return format.format(date);
 	}
 }

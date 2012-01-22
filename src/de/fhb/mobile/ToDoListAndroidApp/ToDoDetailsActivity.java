@@ -9,8 +9,11 @@ import cz.destil.settleup.gui.MultiSpinner;
 import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.UpdateException;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -18,15 +21,19 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 public class ToDoDetailsActivity extends Activity{
 	
@@ -37,6 +44,7 @@ public class ToDoDetailsActivity extends Activity{
 	private List<String> allContacts;
 	private TodoDatabase database;
 	private Todo actualTodo;
+	private int mode;
 	
 	// DateTime vars
 	private int dateYear;
@@ -92,62 +100,119 @@ public class ToDoDetailsActivity extends Activity{
         database = new TodoDatabase(this);
 		database.open();
 		
+		allContacts = getAllContacts();
+		
 		long todoID = getIntent().getLongExtra(ToDoListActivity.ARG_TODO_ID, -1);
-		if(todoID == -1)
+		if(todoID == -1){
+			mode = MODE_NEW;
 			initActivityForNewTodo();
-		else
+		}else{
+			mode = MODE_EDIT;
 			initActivityforEditTodo(todoID);
-			
-        allContacts = new ArrayList<String>();
-        allContacts.add("Contacts1");
-        allContacts.add("Contacts2");
-        allContacts.add("Contacts3");
-        allContacts.add("Contacts4");
-        allContacts.add("Contacts5");
-        allContacts.add("Contacts6");
-        allContacts.add("Contacts7");
-        allContacts.add("Contacts8");
-        allContacts.add("Contacts9");
-        allContacts.add("Contacts10");
-        allContacts.add("Contacts11");
-        allContacts.add("Contacts12");
-        allContacts.add("Contacts13");
-        allContacts.add("Contacts14");
-        allContacts.add("Contacts15");
-        /*
-        MultiSpinner multiSpinner = (MultiSpinner) findViewById(R.id.multi_spinner);
-		multiSpinner.setItems(allContacts, "Items", new MultiSpinnerListener() {
-			
-			@Override
-			public void onItemsSelected(boolean[] selected) {
-				// TODO Auto-generated method stub
-			}
-		});
-	*/
+		}
 	}
 	
-	private void initViewComponents(int mode){
-		 detailsName = (EditText)findViewById(R.id.details_name);
-		 detailsDescription = (EditText)findViewById(R.id.details_description);
-		 detailsFinished = (CheckBox)findViewById(R.id.details_finished);
-		 detailsFavorite = (CheckBox)findViewById(R.id.details_favorite);
-		 detailsContacts = (MultiSpinner)findViewById(R.id.details_contacts);
-		 detailsdateLayout = (LinearLayout)findViewById(R.id.details_date_layout);
-		 detailsDateValue = (TextView)findViewById(R.id.details_date_value);
-		 detailstimeLayout = (LinearLayout)findViewById(R.id.details_time_layout);
-		 detailsTimeValue = (TextView)findViewById(R.id.details_time_value);
-		 detailsConfirm = (Button)findViewById(R.id.details_confirm);
-		 
-		 initDatePicker();
-		 initTimePicker();
-		 
-		 if(mode == MODE_NEW){
-			 detailsFinished.setVisibility(View.INVISIBLE);
-			 detailsConfirm.setText("Create");
-		 }
-		 else if(mode == MODE_EDIT){
-			 detailsConfirm.setText("Save");
-		 }
+	private void initViewComponents() {
+		detailsName = (EditText) findViewById(R.id.details_name);
+		detailsName.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				actualTodo.setName(s.toString());
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {}
+
+		});
+		detailsDescription = (EditText) findViewById(R.id.details_description);
+		detailsDescription.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				actualTodo.setDescription(s.toString());
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {}
+			
+			@Override
+			public void afterTextChanged(Editable s) {}
+		});
+		detailsFinished = (CheckBox) findViewById(R.id.details_finished);
+		detailsFinished
+				.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView,
+							boolean isChecked) {
+						Log.i(this.getClass().toString(),
+								"detailsFinished checkedChanged: " + isChecked);
+						actualTodo.setFinished(isChecked);
+					}
+				});
+		detailsFavorite = (CheckBox) findViewById(R.id.details_favorite);
+		detailsFavorite
+				.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView,
+							boolean isChecked) {
+						Log.i(this.getClass().toString(),
+								"detailsFavorite checkedChanged: " + isChecked);
+						actualTodo.setFavorite(isChecked);
+					}
+				});
+		detailsContacts = (MultiSpinner) findViewById(R.id.details_contacts);
+		detailsContacts.setItems(allContacts, "All Contacts", false,
+				new MultiSpinnerListener() {
+
+					@Override
+					public void onItemsSelected(boolean[] selected) {
+						Log.i(this.getClass().toString(), "contacts selected");
+
+					}
+				});
+
+		detailsdateLayout = (LinearLayout) findViewById(R.id.details_date_layout);
+		detailsDateValue = (TextView) findViewById(R.id.details_date_value);
+		initDatePicker();
+
+		detailstimeLayout = (LinearLayout) findViewById(R.id.details_time_layout);
+		detailsTimeValue = (TextView) findViewById(R.id.details_time_value);
+		initTimePicker();
+
+		detailsConfirm = (Button) findViewById(R.id.details_confirm);
+		detailsConfirm.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Log.i(this.getClass().toString(), "detailsConfirm clicked");
+				try {
+					updateDatabase();
+					database.close();
+					finish();
+				} catch (UpdateException e) {
+					makeToast(e.getMessage());
+					e.printStackTrace();
+				} catch (CreateException e) {
+					makeToast(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		});
+
+		if (mode == MODE_NEW) {
+			detailsFinished.setVisibility(View.INVISIBLE);
+			detailsConfirm.setText("Create");
+		} else if (mode == MODE_EDIT) {
+			detailsConfirm.setText("Save");
+		}
 	}
 	@Override
 	protected Dialog onCreateDialog(int id){
@@ -160,6 +225,11 @@ public class ToDoDetailsActivity extends Activity{
         	return new TimePickerDialog(this, timeSetListener, timeHour, timeMinutes, true);
         }
         return null;
+	}
+	
+	private void makeToast(String text) {
+		Toast toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
+		toast.show();
 	}
 	
 	private void updateDate() {
@@ -180,14 +250,13 @@ public class ToDoDetailsActivity extends Activity{
 	private void initActivityForNewTodo() {
 		Log.i(this.getClass().toString(), "initActivityForNewTodo");
 		actualTodo = new Todo();
-		initViewComponents(MODE_NEW);
-		
+		initViewComponents();
 	}
 
 	private void initActivityforEditTodo(long todoID) {
 		Log.i(this.getClass().toString(), "initActivityforEditTodo ID: " +todoID);
 		actualTodo = database.getTodoById(todoID);	
-		initViewComponents(MODE_EDIT);
+		initViewComponents();
 		initData();
 	}
 	
@@ -200,14 +269,6 @@ public class ToDoDetailsActivity extends Activity{
 		detailsDateValue.setText(date);
 		String time = DateHelper.getTimeAsString(actualTodo.getExpireDate());
 		detailsTimeValue.setText(time);
-		detailsContacts.setItems(getAllContacts(), "All Contacts", false, new MultiSpinnerListener() {
-			
-			@Override
-			public void onItemsSelected(boolean[] selected) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 	}
 	
 	private void initDatePicker(){
@@ -253,5 +314,18 @@ public class ToDoDetailsActivity extends Activity{
 		}
 		people.close();
 		return contacts;
+	}
+	private void updateDatabase() throws UpdateException, CreateException {
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.set(dateYear, dateMonth, dateDay, timeHour, timeMinutes);
+		actualTodo.setExpireDate(cal);
+		switch(mode){
+		case MODE_NEW:
+			database.createTodo(actualTodo);
+			break;
+		case MODE_EDIT:
+			database.updateTodo(actualTodo);
+			break;
+		}
 	}
 }

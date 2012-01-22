@@ -1,6 +1,7 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -16,6 +17,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +28,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -44,15 +47,30 @@ public class ToDoListActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.todolist);
+        Log.i(this.getClass().toString(), "onCreate");
 
         db = new TodoDatabase(this);
 		db.open();
-        // Zugriff auf die Listenansicht
-        ListView listview = (ListView)findViewById(android.R.id.list);
-        initTodos();
 
-        Cursor cursorTodos = db.fetchAllTodos();
-         
+        Button createTodoButton = (Button)findViewById(R.id.newTodoButton);
+        createTodoButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				db.close();
+		    	Intent intent = new Intent(ToDoListActivity.this,
+						ToDoDetailsActivity.class);
+
+				// start the details activity with the intent
+				startActivityForResult(intent, REQUEST_CODE_TODODETAILS);
+			}
+		});
+        initTodos();
+        initListAdapter();
+    }
+    
+    private void initListAdapter(){
+    	Cursor cursorTodos = db.fetchAllTodos();
         // Define the columns of the table
  		// which should be used in the ListView
  		String[] from = new String[] {  TodoTable.KEY_ID, TodoTable.KEY_FAVORITE, TodoTable.KEY_FINISHED, TodoTable.KEY_NAME, TodoTable.KEY_EXPIREDATE};
@@ -69,7 +87,7 @@ public class ToDoListActivity extends ListActivity {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id){
     	Log.i(this.getClass().toString(), "onListItemClick: Todo_id " + id);
-    	
+    	db.close();
     	Intent intent = new Intent(ToDoListActivity.this,
 				ToDoDetailsActivity.class);
 		// pass the item to the intent
@@ -91,6 +109,13 @@ public class ToDoListActivity extends ListActivity {
 		MenuItem allTodosItem = menu.findItem(R.id.all_todos);
 		allTodosItem.setEnabled(false);
 		return true;
+	}
+    
+    @Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+    	Log.i(this.getClass().toString(), "onActivityResult");
+    	db.open();
+		initListAdapter();
 	}
     
     @Override
@@ -120,7 +145,7 @@ public class ToDoListActivity extends ListActivity {
     	private final int expiredateIndex;
     	private final LayoutInflater mLayoutInflater;
 
-    	private final class ViewHolder {
+    	private class ViewHolder {
     		public TextView hiddenID;
     		public CheckBox finishedCheckBox;
     		public CheckBox favoriteCheckBox;
@@ -143,6 +168,8 @@ public class ToDoListActivity extends ListActivity {
     	    this.mLayoutInflater = LayoutInflater.from(mContext);
 
     	}
+		
+		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			Log.i(this.getClass().toString(), "getView");
@@ -167,15 +194,22 @@ public class ToDoListActivity extends ListActivity {
 		        boolean finished = (mCursor.getInt(finishedIndex) > 0) ? true : false;
 		        boolean favorite = (mCursor.getInt(favoriteIndex) > 0) ? true : false;
 		        String name = mCursor.getString(todoNameIndex);
-		        String expiredate = DateHelper.getDateTimeAsString(DateHelper.getCalendarByString((mCursor.getString(expiredateIndex))));
-
-		        //boolean isChecked = ((GlobalVars) mContext.getApplicationContext()).isFriendSelected(fb_id);
-
+		        String expiredateString = mCursor.getString(expiredateIndex);
+		        Calendar expiredate = DateHelper.getCalendarByString(expiredateString);
+		        Calendar calNow = GregorianCalendar.getInstance();
+		        Log.i("", expiredate.getTime().toLocaleString());
+		        Log.i("", calNow.getTime().toLocaleString());
+		        if(expiredate.compareTo(calNow)==-1)
+		        	viewHolder.expiredate.setBackgroundColor(Color.MAGENTA);
+		        if(!expiredateString.isEmpty())
+		        	expiredateString = DateHelper.getDateTimeAsString(expiredate);
+		        else
+		        	expiredateString = "";
 		        viewHolder.hiddenID.setText(id);
 		        viewHolder.finishedCheckBox.setChecked(finished);
 		        viewHolder.favoriteCheckBox.setChecked(favorite);
 		        viewHolder.todoName.setText(name);
-		        viewHolder.expiredate.setText(expiredate);
+		        viewHolder.expiredate.setText(expiredateString);
 		    }
 		    return convertView;
 		}
