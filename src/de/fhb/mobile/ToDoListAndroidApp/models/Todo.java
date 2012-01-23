@@ -32,7 +32,7 @@ public class Todo{
 	}
 
 	public Todo() {
-
+		this.expireDate = null;
 	}
 	
 	public long getId() {

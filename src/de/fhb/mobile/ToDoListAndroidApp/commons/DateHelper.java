@@ -13,23 +13,47 @@ public class DateHelper {
 	
 	/**
 	 * Gets the date as string.
-	 *
-	 * @param calendar
+	 * "MM-dd-yyyy | HH:mm"
+	 * @param cal the cal
 	 * @return the date as string in Format: dd.MM.yyyy, HH:mm
 	 */
 	public static String getDateTimeAsString(Calendar cal){
-		DateFormat format = new SimpleDateFormat("MM-dd-yyyy | HH:mm");
-		return format.format(cal.getTime());
+		if(cal == null)
+			return "";
+		else{
+			DateFormat format = new SimpleDateFormat("MM-dd-yyyy | HH:mm");
+			return format.format(cal.getTime());
+		}
 	}
 	
+	/**
+	 * Gets the date as string.
+	 * "MM-dd-yyyy"
+	 * @param cal the cal
+	 * @return the date as string
+	 */
 	public static String getDateAsString(Calendar cal){
-		DateFormat format = new SimpleDateFormat("MM-dd-yyyy");
-		return format.format(cal.getTime());
+		if(cal == null)
+			return "";
+		else {
+			DateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+			return format.format(cal.getTime());
+		}
 	}
 	
+	/**
+	 * Gets the time as string.
+	 * "HH:mm"
+	 * @param cal the cal
+	 * @return the time as string
+	 */
 	public static String getTimeAsString(Calendar cal){
-		DateFormat format = new SimpleDateFormat("HH:mm");
-		return format.format(cal.getTime());
+		if(cal == null)
+			return "";
+		else{
+			DateFormat format = new SimpleDateFormat("HH:mm");
+			return format.format(cal.getTime());
+		}
 	}
 	
 	/**
@@ -45,6 +69,12 @@ public class DateHelper {
 		return cal;
 	}
 	
+	/**
+	 * Gets the calendar by long.
+	 *
+	 * @param millis the millis
+	 * @return the calendar by long
+	 */
 	public static Calendar getCalendarByLong(long millis){
 		Date date = new Date(millis);
 		Calendar cal = GregorianCalendar.getInstance();
@@ -55,7 +85,7 @@ public class DateHelper {
 
 	/**
 	 * Parses the string to dateformat.
-	 *
+	 * "MM-dd-yyyy | HH:mm"
 	 * @param string the string
 	 * @return the string
 	 */

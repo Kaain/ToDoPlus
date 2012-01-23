@@ -51,6 +51,7 @@ public class ToDoDetailsActivity extends Activity{
 	private int dateDay;
 	private int timeHour;
 	private int timeMinutes;
+	private Calendar calendar;
 	
 	//ViewObjects
 	private EditText detailsName;
@@ -63,6 +64,7 @@ public class ToDoDetailsActivity extends Activity{
 	private LinearLayout detailstimeLayout;
 	private TextView detailsTimeValue;
 	private Button detailsConfirm;
+	private Button detailsDelete;
 	
 	private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
 
@@ -97,7 +99,7 @@ public class ToDoDetailsActivity extends Activity{
         setContentView(R.layout.edit_new);
         
         database = new TodoDatabase(this);
-		
+        
 		allContacts = getAllContacts();
 		
 		long todoID = getIntent().getLongExtra(ToDoListActivity.ARG_TODO_ID, -1);
@@ -203,9 +205,19 @@ public class ToDoDetailsActivity extends Activity{
 				}
 			}
 		});
-
+		
+		detailsDelete = (Button) findViewById(R.id.details_delete);
+		detailsDelete.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				database.deleteTodo(actualTodo.getId());
+				finish();
+			}
+		});
 		if (mode == MODE_NEW) {
 			detailsFinished.setVisibility(View.INVISIBLE);
+			detailsDelete.setVisibility(View.INVISIBLE);
 			detailsConfirm.setText("Create");
 		} else if (mode == MODE_EDIT) {
 			detailsConfirm.setText("Save");
@@ -230,31 +242,39 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void updateDate() {
-        detailsDateValue.setText((dateMonth + 1) +"-" +dateDay +"-" +dateYear);
+		calendar.set(Calendar.DAY_OF_MONTH, dateDay);
+		calendar.set(Calendar.MONTH, dateMonth);
+		calendar.set(Calendar.YEAR, dateYear);
+        detailsDateValue.setText(DateHelper.getDateAsString(calendar));
+        if(detailsTimeValue.getText().length()<1){
+        	updateTime();
+        }
     }
 	
 	private void updateTime() {
-        detailsTimeValue.setText(pad(timeHour) +":" +pad(timeMinutes));
-    }
-	private static String pad(int c) {
-	    if (c >= 10)
-	        return String.valueOf(c);
-	    else
-	        return "0" + String.valueOf(c);
+		calendar.set(Calendar.HOUR_OF_DAY, timeHour);
+		calendar.set(Calendar.MINUTE, timeMinutes);
+        detailsTimeValue.setText(DateHelper.getTimeAsString(calendar));
+        if(detailsDateValue.getText().length()<1){
+        	updateDate();
+        }
 	}
 	
 
 	private void initActivityForNewTodo() {
 		Log.i(this.getClass().toString(), "initActivityForNewTodo");
 		actualTodo = new Todo();
+		calendar = GregorianCalendar.getInstance();
 		initViewComponents();
 	}
 
 	private void initActivityforEditTodo(long todoID) {
 		Log.i(this.getClass().toString(), "initActivityforEditTodo ID: " +todoID);
-		database.open();
 		actualTodo = database.getTodoById(todoID);	
-		database.close();
+		calendar = actualTodo.getExpireDate();
+		if(calendar==null){
+			calendar = GregorianCalendar.getInstance();
+		}
 		initViewComponents();
 		initData();
 	}
@@ -271,14 +291,12 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void initDatePicker(){
-		Calendar cal = actualTodo.getExpireDate();
-		if(cal==null){ 
-			cal= GregorianCalendar.getInstance();
-			cal.roll(Calendar.DAY_OF_MONTH, true);
+		if(detailsDateValue.getText().length()<1){ 
+			calendar.roll(Calendar.DAY_OF_MONTH, true);
 		}
-		dateYear = cal.get(Calendar.YEAR);
-		dateMonth = cal.get(Calendar.MONTH);
-		dateDay = cal.get(Calendar.DAY_OF_MONTH);
+		dateYear = calendar.get(Calendar.YEAR);
+		dateMonth = calendar.get(Calendar.MONTH);
+		dateDay = calendar.get(Calendar.DAY_OF_MONTH);
 		detailsdateLayout.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -290,13 +308,12 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void initTimePicker(){
-		Calendar cal = actualTodo.getExpireDate();
-		if(cal==null){ 
-			cal= GregorianCalendar.getInstance();
-			cal.roll(Calendar.HOUR_OF_DAY, true);
+		if(detailsTimeValue.getText().length()<1){ 
+			Log.i("", "rolllllll");
+			calendar.roll(Calendar.HOUR_OF_DAY, true);
 		}
-		timeHour = cal.get(Calendar.HOUR_OF_DAY);
-		timeMinutes = cal.get(Calendar.MINUTE);
+		timeHour = calendar.get(Calendar.HOUR_OF_DAY);
+		timeMinutes = calendar.get(Calendar.MINUTE);
 		detailstimeLayout.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -321,10 +338,10 @@ public class ToDoDetailsActivity extends Activity{
 		return contacts;
 	}
 	private void updateDatabase() throws UpdateException, CreateException {
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.set(dateYear, dateMonth, dateDay, timeHour, timeMinutes);
-		actualTodo.setExpireDate(cal);
-		database.open();
+		if(!detailsDateValue.getText().toString().isEmpty())
+			actualTodo.setExpireDate(calendar);
+		else
+			actualTodo.setExpireDate(null);
 		switch(mode){
 		case MODE_NEW:
 			database.createTodo(actualTodo);
@@ -333,6 +350,5 @@ public class ToDoDetailsActivity extends Activity{
 			database.updateTodo(actualTodo);
 			break;
 		}
-		database.close();
 	}
 }

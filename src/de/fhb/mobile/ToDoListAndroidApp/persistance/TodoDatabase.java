@@ -16,7 +16,6 @@ import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
 public class TodoDatabase {
 	
-	public static final String KEY_TODO = "todo";
     private Context context;
     private SQLiteDatabase database;
     private TodoDatabaseHelper oh ;
@@ -49,6 +48,7 @@ public class TodoDatabase {
     	boolean favorite = todo.isFavorite();
     	Calendar cal = todo.getExpireDate();
     	List<Long> contacts = todo.getContacts();
+    	open();
     	
     	ContentValues values = new ContentValues();
     	if(name==null)
@@ -62,7 +62,9 @@ public class TodoDatabase {
 		values.put(TodoTable.KEY_EXPIREDATE, (cal==null) ? 0 : cal.getTime().getTime());
 		values.put(TodoTable.KEY_CONTACTS, (contacts==null) ? "": ListHelper.listToString(contacts));
 		
-		return database.insert(TodoTable.TABLE_TODO, null, values);
+		long rowid = database.insert(TodoTable.TABLE_TODO, null, values);
+		close();
+		return rowid;
     }
     
     public List<Todo> fetchAllTodos(String sortby) {
@@ -75,6 +77,7 @@ public class TodoDatabase {
     	final int descriptionIndex;
     	final int contactsIndex;
     	List<Todo> list = new ArrayList<Todo>();
+    	open();
 		Cursor cursor = database.query(TodoTable.TABLE_TODO, null , null, null, null, null,
 				sortby);
 		idIndex = cursor.getColumnIndex(TodoTable.KEY_ID);
@@ -92,7 +95,6 @@ public class TodoDatabase {
 	    	returnTodo.setFavorite((cursor.getInt(favoriteIndex)>0 ? true : false));
 	    	returnTodo.setFinished((cursor.getInt(finishedIndex)>0 ? true : false));
 	    	long expiredate = cursor.getLong(expiredateIndex);
-	    	Log.i("", expiredate+ "date");
 	    	if(expiredate == 0)
 	    		returnTodo.setExpireDate(null);
 	    	else
@@ -102,11 +104,13 @@ public class TodoDatabase {
 	    	list.add(returnTodo);
 	    }
 	    cursor.close();
+	    close();
 	    return list;
 	}
     
     public int updateTodo(Todo todo) throws UpdateException{
     	Log.i(this.getClass().toString(), "new Todo: " +todo);
+    	open();
     	String name = todo.getName();
     	String description = todo.getDescription();
     	boolean finished = todo.isFinished();
@@ -123,14 +127,17 @@ public class TodoDatabase {
 		values.put(TodoTable.KEY_DESCRIPTION, (description==null) ? "": description);
 		values.put(TodoTable.KEY_FINISHED, finished);
 		values.put(TodoTable.KEY_FAVORITE, favorite);
-		values.put(TodoTable.KEY_EXPIREDATE, cal.getTime().getTime());
+		values.put(TodoTable.KEY_EXPIREDATE, (cal==null) ? 0 : cal.getTime().getTime());
 		values.put(TodoTable.KEY_CONTACTS, (contacts==null) ? "": ListHelper.listToString(contacts));
     	
-    	return database.update(TodoTable.TABLE_TODO, values, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(todo.getId())});
+    	int rowsUpdated = database.update(TodoTable.TABLE_TODO, values, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(todo.getId())});
+    	close();
+    	return rowsUpdated;
     }
     
     public int updateBooleanColumns(long id, String column, boolean isChecked){
     	Log.i(this.getClass().toString(), "updateBooleanColumns: " +id + " - "+column +" - " +isChecked);
+    	open();
     	ContentValues values = new ContentValues();
     	
     	if(column == TodoTable.KEY_FINISHED)
@@ -138,12 +145,14 @@ public class TodoDatabase {
     	if(column == TodoTable.KEY_FAVORITE)
     		values.put(TodoTable.KEY_FAVORITE, isChecked);
     	
-    	return database.update(TodoTable.TABLE_TODO, values, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(id)});
+    	int rowsUpdated = database.update(TodoTable.TABLE_TODO, values, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(id)});
+    	close();
+    	return rowsUpdated;
     }
     
     public Todo getTodoById(long id){
     	Log.i(this.getClass().toString(), "getTodoById(" +id +")");
-    	
+    	open();
     	final int idIndex;
     	final int todoNameIndex;
     	final int favoriteIndex;
@@ -177,6 +186,15 @@ public class TodoDatabase {
     	String contacts = cursor.getString(contactsIndex);
     	returnTodo.setContacts(ListHelper.stringToList(contacts));
     	cursor.close();
+    	close();
 		return returnTodo;
     }
+
+	public int deleteTodo(long id) {
+		Log.i(this.getClass().toString(), "deleteTodo: " +id);
+		open();
+		int rowsDeleted = database.delete(TodoTable.TABLE_TODO, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(id)});
+		close();
+		return rowsDeleted;
+	}
 }

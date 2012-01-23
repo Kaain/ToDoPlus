@@ -21,18 +21,28 @@
         android:inputType="textMultiLine" 
         android:hint="Description"/>
 
-    <CheckBox
-        android:id="@+id/details_finished"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="finished?" />
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <CheckBox
+            android:id="@+id/details_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:button="@drawable/starbutton"
+            android:text="important?" />
 
-    <CheckBox
-        android:id="@+id/details_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="favorite?" 
-        android:button="@drawable/starbutton"/>
+        <CheckBox
+            android:id="@+id/details_finished"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="40dp"
+            android:text="finished?" />
+
+    </LinearLayout>
 
     <cz.destil.settleup.gui.MultiSpinner
         android:id="@+id/details_contacts"
@@ -98,6 +108,14 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:text="Save" />
+
+        <Button
+            android:id="@+id/details_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/details_confirm"
+            android:layout_alignParentLeft="true"
+            android:text="Delete" />
 
     </RelativeLayout>
 

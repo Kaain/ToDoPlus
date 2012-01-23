@@ -92,11 +92,10 @@ public class ToDoListActivity extends ListActivity {
 
 	private void initListAdapter(int sorting){
 		this.sorting = sorting;
-		db = db.open();
 		List<Todo> list = new ArrayList<Todo>(0);
 		switch (sorting) {
 		case SORTING_FINISHED:
-			list = db.fetchAllTodos(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC");
+			list = db.fetchAllTodos(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
 			break;
 		case SORTING_FAVORITE_DATE:
 			list = db.fetchAllTodos(TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
@@ -107,9 +106,6 @@ public class ToDoListActivity extends ListActivity {
 		default:
 			list = db.fetchAllTodos(TodoTable.KEY_FINISHED +" DESC");
 		}
-    	
-    	
-    	db.close();
     	
     	ArrayAdapter<Todo> sadapter = new TodoAdapter(this,R.layout.listelement, list);
     	// setze den Adapter auf die Listenansicht
@@ -226,13 +222,18 @@ public class ToDoListActivity extends ListActivity {
 			boolean favorite = todo.isFavorite();
 			String name = todo.getName();
 			Calendar expiredate = todo.getExpireDate();
-			Calendar calNow = GregorianCalendar.getInstance();
-			if (expiredate.compareTo(calNow) == -1)
-				viewHolder.expiredate.setBackgroundColor(Color.rgb(205, 92, 92));
-			else
-				viewHolder.expiredate
-						.setBackgroundColor(android.R.color.transparent);
-			
+			if (expiredate != null) {
+				Calendar calNow = GregorianCalendar.getInstance();
+				if (expiredate.compareTo(calNow) == -1)
+					viewHolder.expiredate.setBackgroundColor(Color.rgb(205, 92,
+							92));
+				else
+					viewHolder.expiredate
+							.setBackgroundColor(android.R.color.transparent);
+				viewHolder.expiredate.setText(todo.getExpireDateAsString());
+			}else{
+				viewHolder.expiredate.setText("");
+			}
 			viewHolder.hiddenID.setText(String.valueOf(id));
 			viewHolder.finishedCheckBox.setOnCheckedChangeListener(null);
 			viewHolder.finishedCheckBox.setChecked(finished);
@@ -245,7 +246,6 @@ public class ToDoListActivity extends ListActivity {
 					.setOnCheckedChangeListener(new UpdateDBOnCheckedChangeListener(id, TodoTable.KEY_FAVORITE));
 					
 			viewHolder.todoName.setText(name);
-			viewHolder.expiredate.setText(todo.getExpireDateAsString());
 			return convertView;
 		}
 	}
@@ -261,9 +261,7 @@ public class ToDoListActivity extends ListActivity {
     	newtodo.setExpireDate(GregorianCalendar.getInstance());
     	newtodo.setContacts(list);
     	try {
-    		db.open();
 			db.createTodo(newtodo);
-			db.close();
 		} catch (CreateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -282,9 +280,7 @@ public class ToDoListActivity extends ListActivity {
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
-			db.open();
 			Log.i(this.getClass().toString(), "UpdateDBOnCheckedChanged " +db.updateBooleanColumns(id, column, isChecked));
-			db.close();
 		}
     }
 }
