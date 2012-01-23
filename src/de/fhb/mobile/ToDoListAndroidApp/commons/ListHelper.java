@@ -1,10 +1,7 @@
 package de.fhb.mobile.ToDoListAndroidApp.commons;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import android.hardware.Camera.Size;
 
 public class ListHelper {
 	public static String listToString(List<Long> list) {

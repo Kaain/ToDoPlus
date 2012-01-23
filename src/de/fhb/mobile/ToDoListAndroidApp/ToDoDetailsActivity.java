@@ -5,15 +5,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import cz.destil.settleup.gui.MultiSpinner;
-import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
-import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
-import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.UpdateException;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -34,6 +26,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import cz.destil.settleup.gui.MultiSpinner;
+import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
+import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
+import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.UpdateException;
 
 public class ToDoDetailsActivity extends Activity{
 	
@@ -98,7 +97,6 @@ public class ToDoDetailsActivity extends Activity{
         setContentView(R.layout.edit_new);
         
         database = new TodoDatabase(this);
-		database.open();
 		
 		allContacts = getAllContacts();
 		
@@ -195,7 +193,6 @@ public class ToDoDetailsActivity extends Activity{
 				Log.i(this.getClass().toString(), "detailsConfirm clicked");
 				try {
 					updateDatabase();
-					database.close();
 					finish();
 				} catch (UpdateException e) {
 					makeToast(e.getMessage());
@@ -255,7 +252,9 @@ public class ToDoDetailsActivity extends Activity{
 
 	private void initActivityforEditTodo(long todoID) {
 		Log.i(this.getClass().toString(), "initActivityforEditTodo ID: " +todoID);
+		database.open();
 		actualTodo = database.getTodoById(todoID);	
+		database.close();
 		initViewComponents();
 		initData();
 	}
@@ -272,8 +271,11 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void initDatePicker(){
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.roll(Calendar.DAY_OF_MONTH, true);
+		Calendar cal = actualTodo.getExpireDate();
+		if(cal==null){ 
+			cal= GregorianCalendar.getInstance();
+			cal.roll(Calendar.DAY_OF_MONTH, true);
+		}
 		dateYear = cal.get(Calendar.YEAR);
 		dateMonth = cal.get(Calendar.MONTH);
 		dateDay = cal.get(Calendar.DAY_OF_MONTH);
@@ -288,8 +290,11 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void initTimePicker(){
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.roll(Calendar.HOUR_OF_DAY, true);
+		Calendar cal = actualTodo.getExpireDate();
+		if(cal==null){ 
+			cal= GregorianCalendar.getInstance();
+			cal.roll(Calendar.HOUR_OF_DAY, true);
+		}
 		timeHour = cal.get(Calendar.HOUR_OF_DAY);
 		timeMinutes = cal.get(Calendar.MINUTE);
 		detailstimeLayout.setOnClickListener(new View.OnClickListener() {
@@ -319,6 +324,7 @@ public class ToDoDetailsActivity extends Activity{
 		Calendar cal = GregorianCalendar.getInstance();
 		cal.set(dateYear, dateMonth, dateDay, timeHour, timeMinutes);
 		actualTodo.setExpireDate(cal);
+		database.open();
 		switch(mode){
 		case MODE_NEW:
 			database.createTodo(actualTodo);
@@ -327,5 +333,6 @@ public class ToDoDetailsActivity extends Activity{
 			database.updateTodo(actualTodo);
 			break;
 		}
+		database.close();
 	}
 }

@@ -1,21 +1,12 @@
 package de.fhb.mobile.ToDoListAndroidApp.models;
 
-import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 
-import android.provider.ContactsContract;
-import android.text.format.DateFormat;
+public class Todo{
 
-public class Todo implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -13463587883686746L;
 	private long id;
 	private String name;
 	private String description;

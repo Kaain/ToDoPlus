@@ -7,7 +7,7 @@
     <string name="hint_todoname">Name of Todo</string>
     <string name="ok">OK</string>
     <string name="all_todos">Todos</string>
-    <string name="contacts">Contacts</string>
+    <string name="all_contacts_with_todos">Contacts with Todos</string>
     <string name="help">Help</string>
     <string name="no_todos">Currently there are no Todo items maintained</string>
 	<string name="menu_insert">Add Item</string>

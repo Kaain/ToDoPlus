@@ -1,23 +1,18 @@
 package de.fhb.mobile.ToDoListAndroidApp.persistance;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-
-import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
-import de.fhb.mobile.ToDoListAndroidApp.commons.ListHelper;
-import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
+import de.fhb.mobile.ToDoListAndroidApp.commons.ListHelper;
+import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
 public class TodoDatabase {
 	
@@ -31,13 +26,14 @@ public class TodoDatabase {
     }
     
     public TodoDatabase open() throws SQLException {
+    	Log.i(this.getClass().toString(), "open DB");
     	this.oh = new TodoDatabaseHelper(this.context);
         this.database = oh.getWritableDatabase();
 		return this;
 	}
 
-    public void close()
-    {
+    public void close(){
+    	Log.i(this.getClass().toString(), "close DB");
         database.close();
         oh.close();
         database= null;
@@ -69,15 +65,47 @@ public class TodoDatabase {
 		return database.insert(TodoTable.TABLE_TODO, null, values);
     }
     
-    public Cursor fetchAllTodos() {
+    public List<Todo> fetchAllTodos() {
 		Log.i(this.getClass().toString(), "fetchAllTodos");
-		
-		return database.query(TodoTable.TABLE_TODO, null , null, null, null, null,
-				TodoTable.KEY_ID + " DESC");
+    	final int idIndex;
+    	final int todoNameIndex;
+    	final int favoriteIndex;
+    	final int finishedIndex;
+    	final int expiredateIndex;
+    	final int descriptionIndex;
+    	final int contactsIndex;
+    	List<Todo> list = new ArrayList<Todo>();
+		Cursor cursor = database.query(TodoTable.TABLE_TODO, null , null, null, null, null,
+				TodoTable.KEY_FINISHED + " DESC");
+		idIndex = cursor.getColumnIndex(TodoTable.KEY_ID);
+	    todoNameIndex = cursor.getColumnIndex(TodoTable.KEY_NAME);
+	    descriptionIndex = cursor.getColumnIndex(TodoTable.KEY_DESCRIPTION);
+	    finishedIndex = cursor.getColumnIndex(TodoTable.KEY_FINISHED);
+	    favoriteIndex = cursor.getColumnIndex(TodoTable.KEY_FAVORITE);
+	    expiredateIndex = cursor.getColumnIndex(TodoTable.KEY_EXPIREDATE);
+	    contactsIndex = cursor.getColumnIndex(TodoTable.KEY_CONTACTS);
+	    while(cursor.moveToNext()){
+	    	Todo returnTodo = new Todo();
+	    	returnTodo.setId(cursor.getLong(idIndex));
+	    	returnTodo.setName(cursor.getString(todoNameIndex));
+	    	returnTodo.setDescription(cursor.getString(descriptionIndex));
+	    	returnTodo.setFavorite((cursor.getInt(favoriteIndex)>0 ? true : false));
+	    	returnTodo.setFinished((cursor.getInt(finishedIndex)>0 ? true : false));
+	    	String expiredate = cursor.getString(expiredateIndex);
+	    	if(expiredate.isEmpty())
+	    		returnTodo.setExpireDate(null);
+	    	else
+	    		returnTodo.setExpireDate(DateHelper.getCalendarByString((expiredate)));
+	    	String contacts = cursor.getString(contactsIndex);
+	    	returnTodo.setContacts(ListHelper.stringToList(contacts));
+	    	list.add(returnTodo);
+	    }
+	    cursor.close();
+	    return list;
 	}
     
     public int updateTodo(Todo todo) throws UpdateException{
-    	Log.i(this.getClass().toString(), "new Todo:" +todo);
+    	Log.i(this.getClass().toString(), "new Todo: " +todo);
     	String name = todo.getName();
     	String description = todo.getDescription();
     	boolean finished = todo.isFinished();
@@ -100,6 +128,18 @@ public class TodoDatabase {
     	return database.update(TodoTable.TABLE_TODO, values, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(todo.getId())});
     }
     
+    public int updateBooleanColumns(long id, String column, boolean isChecked){
+    	Log.i(this.getClass().toString(), "updateBooleanColumns: " +id + " - "+column +" - " +isChecked);
+    	ContentValues values = new ContentValues();
+    	
+    	if(column == TodoTable.KEY_FINISHED)
+    		values.put(TodoTable.KEY_FINISHED, isChecked);
+    	if(column == TodoTable.KEY_FAVORITE)
+    		values.put(TodoTable.KEY_FAVORITE, isChecked);
+    	
+    	return database.update(TodoTable.TABLE_TODO, values, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(id)});
+    }
+    
     public Todo getTodoById(long id){
     	Log.i(this.getClass().toString(), "getTodoById(" +id +")");
     	
@@ -111,8 +151,7 @@ public class TodoDatabase {
     	final int descriptionIndex;
     	final int contactsIndex;
     	
-    	String where = TodoTable.KEY_ID +"=" +id;
-		Cursor cursor = database.query(TodoTable.TABLE_TODO, null, where , null, null,
+		Cursor cursor = database.query(TodoTable.TABLE_TODO, null, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(id)}, null,
 				null, null);
 		cursor.moveToFirst();
 	    idIndex = cursor.getColumnIndex(TodoTable.KEY_ID);
@@ -136,6 +175,7 @@ public class TodoDatabase {
     		returnTodo.setExpireDate(DateHelper.getCalendarByString((expiredate)));
     	String contacts = cursor.getString(contactsIndex);
     	returnTodo.setContacts(ListHelper.stringToList(contacts));
+    	cursor.close();
 		return returnTodo;
     }
 }

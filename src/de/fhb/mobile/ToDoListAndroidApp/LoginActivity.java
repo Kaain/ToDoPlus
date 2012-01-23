@@ -1,6 +1,5 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
-import de.fhb.mobile.ToDoListAndroidApp.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;

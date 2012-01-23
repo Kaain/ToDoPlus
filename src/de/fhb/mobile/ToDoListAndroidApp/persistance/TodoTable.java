@@ -1,7 +1,5 @@
 package de.fhb.mobile.ToDoListAndroidApp.persistance;
 
-import java.util.logging.Logger;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
