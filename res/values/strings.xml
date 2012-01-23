@@ -6,6 +6,7 @@
     <string name="app_name_login">ToDoPlus Login</string>
     <string name="hint_todoname">Name of Todo</string>
     <string name="ok">OK</string>
+    <string name="newtodo">New Todo</string>
     <string name="all_todos">Todos</string>
     <string name="all_contacts_with_todos">Contacts with Todos</string>
     <string name="help">Help</string>
@@ -23,6 +24,9 @@
         <item>todo3</item>
         <item>todo1</item>
     </string-array>
-        <string name="newTodo">New Todo</string>
+    <string name="newTodo">New Todo</string>
 
+    <string name="choose_sorting">Choose a sorting</string>
+
+            
 </resources>

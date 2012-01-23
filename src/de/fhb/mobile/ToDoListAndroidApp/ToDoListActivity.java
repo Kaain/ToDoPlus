@@ -18,11 +18,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
@@ -32,9 +35,13 @@ import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoTable;
 public class ToDoListActivity extends ListActivity {
 	
 	public static final int REQUEST_CODE_TODODETAILS = 1;
+	private static final int SORTING_FINISHED = 10;
+	private static final int SORTING_FAVORITE_DATE = 20;
+	private static final int SORTING_DATE_FAVORITE = 30;
 	public static final String ARG_TODO_ID = "todoObjectID";
 	private TodoDatabase db;
-	Button createTodoButton;
+	private int sorting;
+	private Spinner spinner_sortby;
 	
     /** Called when the activity is first created. */
     @Override
@@ -42,28 +49,66 @@ public class ToDoListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.todolist);
         Log.i(this.getClass().toString(), "onCreate");
+        initSortSpinner();
 
         db = new TodoDatabase(this);
-        
-        createTodoButton = (Button)findViewById(R.id.newTodoButton);
-        createTodoButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-		    	Intent intent = new Intent(ToDoListActivity.this,
-						ToDoDetailsActivity.class);
 
-				// start the details activity with the intent
-				startActivityForResult(intent,REQUEST_CODE_TODODETAILS);
-			}
-		});
         //initTodos();
-        initListAdapter();
+        initListAdapter(SORTING_FINISHED);
     }
     
-    private void initListAdapter(){
-    	db = db.open();
-    	List<Todo> list = db.fetchAllTodos();
+    private void initSortSpinner() {
+    	spinner_sortby = (Spinner)findViewById(R.id.spinner_orderby);
+		CharSequence[] objects = { "by finished", "by importance + date", "by date + importance"};
+		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, objects );
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner_sortby.setAdapter(adapter);
+		spinner_sortby.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+				@Override
+				public void onItemSelected(AdapterView<?> parent,
+				        View view, int pos, long id)  {
+					Log.i(this.getClass().toString(), "Sortspinner select: pos= " +pos);
+					switch(pos){
+					case 0:
+						initListAdapter(SORTING_FINISHED);
+						break;
+					case 1:
+						initListAdapter(SORTING_FAVORITE_DATE);
+						break;
+					case 2:
+						initListAdapter(SORTING_DATE_FAVORITE);
+						break;
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parent) {
+					// TODO Auto-generated method stub
+					
+				}
+		});
+	}
+
+	private void initListAdapter(int sorting){
+		this.sorting = sorting;
+		db = db.open();
+		List<Todo> list = new ArrayList<Todo>(0);
+		switch (sorting) {
+		case SORTING_FINISHED:
+			list = db.fetchAllTodos(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC");
+			break;
+		case SORTING_FAVORITE_DATE:
+			list = db.fetchAllTodos(TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
+			break;
+		case SORTING_DATE_FAVORITE:
+			list = db.fetchAllTodos(TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC" );
+			break;
+		default:
+			list = db.fetchAllTodos(TodoTable.KEY_FINISHED +" DESC");
+		}
+    	
+    	
     	db.close();
     	
     	ArrayAdapter<Todo> sadapter = new TodoAdapter(this,R.layout.listelement, list);
@@ -91,31 +136,41 @@ public class ToDoListActivity extends ListActivity {
     }
     
     @Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		MenuItem allTodosItem = menu.findItem(R.id.all_todos);
-		allTodosItem.setEnabled(false);
-		return true;
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+    	Log.i(this.getClass().toString(), "onActivityResult");
+		initListAdapter(sorting);
 	}
     
     @Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data){
-    	Log.i(this.getClass().toString(), "onActivityResult");
-		initListAdapter();
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		MenuItem allTodosItem = menu.findItem(R.id.menu_item_all_todos);
+		allTodosItem.setEnabled(false);
+		return true;
 	}
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-        case R.id.all_todos:
+        case R.id.menu_item_create_new_todo:
+        	startCreateActivity();
+        	return true;
+        case R.id.menu_item_all_todos:
         	//TODO
             return true;
-        case R.id.all_contacts_with_todos:
+        case R.id.menu_item_all_contacts_with_todos:
         	//TODO
             return true;
         default:
             return super.onOptionsItemSelected(item);
         }
+    }
+    
+    private void startCreateActivity(){
+    	Intent intent = new Intent(ToDoListActivity.this,
+				ToDoDetailsActivity.class);
+		// start the details activity with the intent
+		startActivityForResult(intent,REQUEST_CODE_TODODETAILS);
     }
     
     private class TodoAdapter extends ArrayAdapter<Todo> {
@@ -173,7 +228,7 @@ public class ToDoListActivity extends ListActivity {
 			Calendar expiredate = todo.getExpireDate();
 			Calendar calNow = GregorianCalendar.getInstance();
 			if (expiredate.compareTo(calNow) == -1)
-				viewHolder.expiredate.setBackgroundColor(Color.MAGENTA);
+				viewHolder.expiredate.setBackgroundColor(Color.rgb(205, 92, 92));
 			else
 				viewHolder.expiredate
 						.setBackgroundColor(android.R.color.transparent);
@@ -200,13 +255,15 @@ public class ToDoListActivity extends ListActivity {
     	list.add(1l);
     	list.add(2342344l);
     	Todo newtodo = new Todo();
-    	newtodo.setName("testSth" +Math.random()*100);
+    	newtodo.setName("testSth" +(int)Math.random()*100);
     	newtodo.setFinished(false);
     	newtodo.setFavorite(true);
     	newtodo.setExpireDate(GregorianCalendar.getInstance());
     	newtodo.setContacts(list);
     	try {
+    		db.open();
 			db.createTodo(newtodo);
+			db.close();
 		} catch (CreateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -229,6 +286,5 @@ public class ToDoListActivity extends ListActivity {
 			Log.i(this.getClass().toString(), "UpdateDBOnCheckedChanged " +db.updateBooleanColumns(id, column, isChecked));
 			db.close();
 		}
-    	
     }
 }

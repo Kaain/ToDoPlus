@@ -59,13 +59,13 @@ public class TodoDatabase {
 		values.put(TodoTable.KEY_DESCRIPTION, (description==null) ? "": description);
 		values.put(TodoTable.KEY_FINISHED, finished);
 		values.put(TodoTable.KEY_FAVORITE, favorite);
-		values.put(TodoTable.KEY_EXPIREDATE, (cal==null) ? "" : cal.getTime().toString());
+		values.put(TodoTable.KEY_EXPIREDATE, (cal==null) ? 0 : cal.getTime().getTime());
 		values.put(TodoTable.KEY_CONTACTS, (contacts==null) ? "": ListHelper.listToString(contacts));
 		
 		return database.insert(TodoTable.TABLE_TODO, null, values);
     }
     
-    public List<Todo> fetchAllTodos() {
+    public List<Todo> fetchAllTodos(String sortby) {
 		Log.i(this.getClass().toString(), "fetchAllTodos");
     	final int idIndex;
     	final int todoNameIndex;
@@ -76,7 +76,7 @@ public class TodoDatabase {
     	final int contactsIndex;
     	List<Todo> list = new ArrayList<Todo>();
 		Cursor cursor = database.query(TodoTable.TABLE_TODO, null , null, null, null, null,
-				TodoTable.KEY_FINISHED + " DESC");
+				sortby);
 		idIndex = cursor.getColumnIndex(TodoTable.KEY_ID);
 	    todoNameIndex = cursor.getColumnIndex(TodoTable.KEY_NAME);
 	    descriptionIndex = cursor.getColumnIndex(TodoTable.KEY_DESCRIPTION);
@@ -91,11 +91,12 @@ public class TodoDatabase {
 	    	returnTodo.setDescription(cursor.getString(descriptionIndex));
 	    	returnTodo.setFavorite((cursor.getInt(favoriteIndex)>0 ? true : false));
 	    	returnTodo.setFinished((cursor.getInt(finishedIndex)>0 ? true : false));
-	    	String expiredate = cursor.getString(expiredateIndex);
-	    	if(expiredate.isEmpty())
+	    	long expiredate = cursor.getLong(expiredateIndex);
+	    	Log.i("", expiredate+ "date");
+	    	if(expiredate == 0)
 	    		returnTodo.setExpireDate(null);
 	    	else
-	    		returnTodo.setExpireDate(DateHelper.getCalendarByString((expiredate)));
+	    		returnTodo.setExpireDate(DateHelper.getCalendarByLong(expiredate));
 	    	String contacts = cursor.getString(contactsIndex);
 	    	returnTodo.setContacts(ListHelper.stringToList(contacts));
 	    	list.add(returnTodo);
@@ -122,7 +123,7 @@ public class TodoDatabase {
 		values.put(TodoTable.KEY_DESCRIPTION, (description==null) ? "": description);
 		values.put(TodoTable.KEY_FINISHED, finished);
 		values.put(TodoTable.KEY_FAVORITE, favorite);
-		values.put(TodoTable.KEY_EXPIREDATE, cal.getTime().toString());
+		values.put(TodoTable.KEY_EXPIREDATE, cal.getTime().getTime());
 		values.put(TodoTable.KEY_CONTACTS, (contacts==null) ? "": ListHelper.listToString(contacts));
     	
     	return database.update(TodoTable.TABLE_TODO, values, TodoTable.KEY_ID +"=?", new String[]{String.valueOf(todo.getId())});
@@ -168,11 +169,11 @@ public class TodoDatabase {
     	returnTodo.setDescription(cursor.getString(descriptionIndex));
     	returnTodo.setFavorite((cursor.getInt(favoriteIndex)>0 ? true : false));
     	returnTodo.setFinished((cursor.getInt(finishedIndex)>0 ? true : false));
-    	String expiredate = cursor.getString(expiredateIndex);
-    	if(expiredate=="")
+    	long expiredate = cursor.getLong(expiredateIndex);
+    	if(expiredate==0)
     		returnTodo.setExpireDate(null);
     	else
-    		returnTodo.setExpireDate(DateHelper.getCalendarByString((expiredate)));
+    		returnTodo.setExpireDate(DateHelper.getCalendarByLong(expiredate));
     	String contacts = cursor.getString(contactsIndex);
     	returnTodo.setContacts(ListHelper.stringToList(contacts));
     	cursor.close();

@@ -45,6 +45,13 @@ public class DateHelper {
 		return cal;
 	}
 	
+	public static Calendar getCalendarByLong(long millis){
+		Date date = new Date(millis);
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.setTime(date);
+		return cal;
+	}
+	
 
 	/**
 	 * Parses the string to dateformat.
