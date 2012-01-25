@@ -24,7 +24,7 @@
             android:name=".LoginActivity" >
             -->
             <activity
-            android:label="ToDoList"
+            android:label="All Todos"
             android:name=".ToDoListActivity">
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -33,19 +33,18 @@
             </intent-filter>
         </activity>
         <activity 
-            android:label="ToDoList"
+            android:label="All Todos"
             android:name=".ToDoListActivity">
         </activity>
         <activity 
-            android:label="ToDoDetails"
+            android:label="Details for todo"
             android:name=".ToDoDetailsActivity">
         </activity>
-        <!--  
-        <provider
-            android:name=".contentprovider.TodoContentProvider"
-            android:authorities="de.fhb.mobile.ToDoListAndroidApp.contentprovider" >
-        </provider>
-        -->
+        
+        <activity 
+            android:label="All contacts with todos"
+            android:name=".AllContactsActivity">
+        </activity>
     </application>
 
 </manifest>

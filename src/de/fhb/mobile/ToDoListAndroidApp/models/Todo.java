@@ -1,5 +1,6 @@
 package de.fhb.mobile.ToDoListAndroidApp.models;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class Todo{
 
 	public Todo() {
 		this.expireDate = null;
+		this.contacts = new ArrayList<Long>(0);
 	}
 	
 	public long getId() {

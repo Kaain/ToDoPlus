@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -36,13 +37,18 @@ import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoTable;
 public class ToDoListActivity extends ListActivity {
 	
 	public static final int REQUEST_CODE_TODODETAILS = 1;
+	public static final int REQUEST_CODE_ALLCONTACTS = 2;
 	private static final int SORTING_FINISHED = 10;
 	private static final int SORTING_FAVORITE_DATE = 20;
 	private static final int SORTING_DATE_FAVORITE = 30;
+	private static final int MODE_ALLTODOS = 1000;
+	private static final int MODE_ALLTODOS_FOR_CONTACT = 2000;
 	public static final String ARG_TODO_ID = "todoObjectID";
 	private TodoDatabase db;
 	private int sorting;
 	private Spinner spinner_sortby;
+	private int mode;
+	private long contactId;
 	
     /** Called when the activity is first created. */
     @Override
@@ -50,15 +56,39 @@ public class ToDoListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.todolist);
         Log.i(this.getClass().toString(), "onCreate");
+        mode = MODE_ALLTODOS;
         initSortSpinner();
-
         db = new TodoDatabase(this);
-
-        //initTodos();
-        initListAdapter(SORTING_FINISHED);
+        db.open();
+        initTodos();
+        //initListAdapter(SORTING_FINISHED);
+    }
+    @Override
+    public void onPause(){
+    	Log.i(this.getClass().toString(), "onPause");
+    	super.onPause();
+    	db.close();
+    }
+    @Override
+    public void onStop(){
+    	Log.i(this.getClass().toString(), "onStop");
+    	super.onStop();
+    }
+    @Override
+    public void onResume(){
+    	Log.i(this.getClass().toString(), "onResume");
+    	super.onResume();
+    }
+    @Override
+    public void onRestart(){
+    	Log.i(this.getClass().toString(), "onRestart");
+    	super.onRestart();
+    	db.open();
+    	initListAdapter(sorting);
     }
     
     private void initSortSpinner() {
+    	Log.i(this.getClass().toString(), "initSortSpinner()");
     	spinner_sortby = (Spinner)findViewById(R.id.spinner_orderby);
 		CharSequence[] objects = { "by finished", "by importance + date", "by date + importance"};
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, objects );
@@ -89,26 +119,63 @@ public class ToDoListActivity extends ListActivity {
 	}
 
 	private void initListAdapter(int sorting){
+		Log.i(this.getClass().toString(), "initListAdapter()");
 		this.sorting = sorting;
+		
+		switch(mode){
+		case MODE_ALLTODOS:
+			initListAdapterForAllTodos();
+			break;
+		case MODE_ALLTODOS_FOR_CONTACT:
+			initListAdapterForAllTodosForContact();
+			break;
+		}
+		
+    }
+	
+	private void initListAdapterForAllTodosForContact(){
+		Log.i(this.getClass().toString(), "initListAdapterForAllTodosForContact()");
 		List<Todo> list = new ArrayList<Todo>(0);
+		
 		switch (sorting) {
 		case SORTING_FINISHED:
-			list = db.fetchAllTodos(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
+			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC", contactId);
 			break;
 		case SORTING_FAVORITE_DATE:
-			list = db.fetchAllTodos(TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
+			list = db.getAllTodosForContact(TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC", contactId);
 			break;
 		case SORTING_DATE_FAVORITE:
-			list = db.fetchAllTodos(TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC" );
+			list = db.getAllTodosForContact(TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC", contactId);
 			break;
 		default:
-			list = db.fetchAllTodos(TodoTable.KEY_FINISHED +" DESC");
+			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC", contactId);
 		}
-    	
     	ArrayAdapter<Todo> sadapter = new TodoAdapter(this,R.layout.listelement, list);
     	// setze den Adapter auf die Listenansicht
         this.setListAdapter(sadapter);
-    }
+	}
+	
+	private void initListAdapterForAllTodos(){
+		Log.i(this.getClass().toString(), "initListAdapterForAllTodos()");
+		List<Todo> list = new ArrayList<Todo>(0);
+		
+		switch (sorting) {
+		case SORTING_FINISHED:
+			list = db.getAllTodos(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
+			break;
+		case SORTING_FAVORITE_DATE:
+			list = db.getAllTodos(TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
+			break;
+		case SORTING_DATE_FAVORITE:
+			list = db.getAllTodos(TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC" );
+			break;
+		default:
+			list = db.getAllTodos(TodoTable.KEY_FINISHED +" DESC");
+		}
+    	ArrayAdapter<Todo> sadapter = new TodoAdapter(this,R.layout.listelement, list);
+    	// setze den Adapter auf die Listenansicht
+        this.setListAdapter(sadapter);
+	}
     
     @Override
     public void onListItemClick(ListView l, View v, int position, long id){
@@ -130,11 +197,21 @@ public class ToDoListActivity extends ListActivity {
         return true;
     }
     
-    @Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data){
-    	Log.i(this.getClass().toString(), "onActivityResult");
-		initListAdapter(sorting);
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.i(this.getClass().toString(), "onActivityResult");
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+		case (REQUEST_CODE_ALLCONTACTS):
+			if (resultCode == Activity.RESULT_OK) { 
+				mode = MODE_ALLTODOS_FOR_CONTACT;
+			contactId = data.getLongExtra(AllContactsActivity.ARG_CONTACT_ID,
+					-1);
+			}
+			break;
+		}
 	}
+	
     
     @Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -151,17 +228,24 @@ public class ToDoListActivity extends ListActivity {
         	startCreateActivity();
         	return true;
         case R.id.menu_item_all_todos:
-        	//TODO
             return true;
         case R.id.menu_item_all_contacts_with_todos:
-        	//TODO
+        	startAllContactActivity();
             return true;
         default:
             return super.onOptionsItemSelected(item);
         }
     }
     
-    private void startCreateActivity(){
+    private void startAllContactActivity() {
+    	Log.i(this.getClass().toString(), "startAllContactActivity()");
+    	Intent intent = new Intent(ToDoListActivity.this,
+    			AllContactsActivity.class);
+		startActivityForResult(intent, REQUEST_CODE_ALLCONTACTS);
+	}
+
+	private void startCreateActivity(){
+		Log.i(this.getClass().toString(), "startCreateActivity()");
     	Intent intent = new Intent(ToDoListActivity.this,
 				ToDoDetailsActivity.class);
 		// start the details activity with the intent
@@ -196,7 +280,7 @@ public class ToDoListActivity extends ListActivity {
 		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			Log.i(this.getClass().toString(), "getView");
+			Log.i(this.getClass().toString(), "getView postion: " +position);
 			ViewHolder viewHolder;
 			Todo todo = list.get(position);
 			if (convertView == null) {
@@ -231,6 +315,7 @@ public class ToDoListActivity extends ListActivity {
 							0));
 					viewHolder.expiredate.setTextColor(Color.BLACK);
 				}else{
+					viewHolder.expiredate.setTextColor(Color.LTGRAY);
 					viewHolder.expiredate
 							.setBackgroundColor(android.R.color.transparent);
 				}

@@ -41,7 +41,7 @@ public class ToDoDetailsActivity extends Activity{
 	private static final int MODE_NEW = 10;
 	private static final int MODE_EDIT = 20;
 	private List<String> allContacts;
-	private TodoDatabase database;
+	private TodoDatabase db;
 	private Todo actualTodo;
 	private int mode;
 	
@@ -98,8 +98,8 @@ public class ToDoDetailsActivity extends Activity{
 		
         setContentView(R.layout.edit_new);
         
-        database = new TodoDatabase(this);
-        
+        db = new TodoDatabase(this);
+		db.open();
 		allContacts = getAllContacts();
 		
 		long todoID = getIntent().getLongExtra(ToDoListActivity.ARG_TODO_ID, -1);
@@ -111,8 +111,20 @@ public class ToDoDetailsActivity extends Activity{
 			initActivityforEditTodo(todoID);
 		}
 	}
+	@Override
+    public void onPause(){
+    	Log.i(this.getClass().toString(), "onPause");
+    	super.onPause();
+    	db.close();
+    }
+	
+	public void onDestroy(){
+		Log.i(this.getClass().toString(), "onDestroy");
+		super.onDestroy();
+	}
 	
 	private void initViewComponents() {
+		Log.i(this.getClass().toString(), "initViewComponents()");
 		detailsName = (EditText) findViewById(R.id.details_name);
 		detailsName.addTextChangedListener(new TextWatcher() {
 			
@@ -211,7 +223,7 @@ public class ToDoDetailsActivity extends Activity{
 			
 			@Override
 			public void onClick(View v) {
-				database.deleteTodo(actualTodo.getId());
+				db.deleteTodo(actualTodo.getId());
 				finish();
 			}
 		});
@@ -225,7 +237,7 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	@Override
 	protected Dialog onCreateDialog(int id){
-		
+		Log.i(this.getClass().toString(), "onCreateDialog() - " +id);
 		switch (id) {
 
         case DATE_DIALOG_ID:
@@ -242,6 +254,7 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void updateDate() {
+		Log.i(this.getClass().toString(), "updateDate()");
 		calendar.set(Calendar.DAY_OF_MONTH, dateDay);
 		calendar.set(Calendar.MONTH, dateMonth);
 		calendar.set(Calendar.YEAR, dateYear);
@@ -252,6 +265,7 @@ public class ToDoDetailsActivity extends Activity{
     }
 	
 	private void updateTime() {
+		Log.i(this.getClass().toString(), "updateTime()");
 		calendar.set(Calendar.HOUR_OF_DAY, timeHour);
 		calendar.set(Calendar.MINUTE, timeMinutes);
         detailsTimeValue.setText(DateHelper.getTimeAsString(calendar));
@@ -270,7 +284,7 @@ public class ToDoDetailsActivity extends Activity{
 
 	private void initActivityforEditTodo(long todoID) {
 		Log.i(this.getClass().toString(), "initActivityforEditTodo ID: " +todoID);
-		actualTodo = database.getTodoById(todoID);	
+		actualTodo = db.getTodoById(todoID);	
 		calendar = actualTodo.getExpireDate();
 		if(calendar==null){
 			calendar = GregorianCalendar.getInstance();
@@ -280,6 +294,7 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void initData(){
+		Log.i(this.getClass().toString(), "initData()");
 		detailsName.setText(actualTodo.getName());
 		detailsDescription.setText(actualTodo.getDescription());
 		detailsFavorite.setChecked(actualTodo.isFavorite());
@@ -291,6 +306,7 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void initDatePicker(){
+		Log.i(this.getClass().toString(), "initDatePicker()");
 		if(detailsDateValue.getText().length()<1){ 
 			calendar.roll(Calendar.DAY_OF_MONTH, true);
 		}
@@ -308,8 +324,8 @@ public class ToDoDetailsActivity extends Activity{
 	}
 	
 	private void initTimePicker(){
+		Log.i(this.getClass().toString(), "initTimePicker()");
 		if(detailsTimeValue.getText().length()<1){ 
-			Log.i("", "rolllllll");
 			calendar.roll(Calendar.HOUR_OF_DAY, true);
 		}
 		timeHour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -338,16 +354,17 @@ public class ToDoDetailsActivity extends Activity{
 		return contacts;
 	}
 	private void updateDatabase() throws UpdateException, CreateException {
+		Log.i(this.getClass().toString(), "updateDatabase()");
 		if(!detailsDateValue.getText().toString().isEmpty())
 			actualTodo.setExpireDate(calendar);
 		else
 			actualTodo.setExpireDate(null);
 		switch(mode){
 		case MODE_NEW:
-			database.createTodo(actualTodo);
+			db.createTodo(actualTodo);
 			break;
 		case MODE_EDIT:
-			database.updateTodo(actualTodo);
+			db.updateTodo(actualTodo);
 			break;
 		}
 	}

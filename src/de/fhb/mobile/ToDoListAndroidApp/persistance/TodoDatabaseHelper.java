@@ -17,10 +17,13 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database) {
         TodoTable.onCreate(database);
+        TodoToContactTable.onCreate(database);
+        TodoViews.createViewTodoAndContact(database);
     }
 
-    @Override
+	@Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
     	TodoTable.onUpgrade(database, oldVersion, newVersion);
+    	TodoToContactTable.onUpgrade(database, oldVersion, newVersion);
     }
 }

@@ -50,15 +50,15 @@
         android:layout_below="@+id/list_todoname"
         android:text="Small Text"
         android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
     <ImageButton
         android:id="@+id/list_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/ic_menu_delete"
         android:focusable="false"
-        android:focusableInTouchMode="false" />
+        android:focusableInTouchMode="false"
+        android:src="@drawable/ic_menu_delete" />
 
 </RelativeLayout>

@@ -11,7 +11,8 @@ public class TodoTable {
 	public static final String KEY_FINISHED = "finished";
 	public static final String KEY_FAVORITE = "favorite";
 	public static final String KEY_EXPIREDATE = "expiredate";
-	public static final String KEY_CONTACTS = "contacts";
+
+	//public static final String KEY_CONTACTS = "contacts";
 	private static final String DATABASE_CREATE_TODO = "CREATE TABLE IF  NOT EXISTS "
 			+ TABLE_TODO
 			+ "("
@@ -20,8 +21,8 @@ public class TodoTable {
 			+ KEY_DESCRIPTION +	" TEXT, "
 			+ KEY_FINISHED + " INTEGER, "
 			+ KEY_FAVORITE + " INTEGER, "
-			+ KEY_EXPIREDATE + " INTEGER, " 
-			+ KEY_CONTACTS + " TEXT" 
+			+ KEY_EXPIREDATE + " INTEGER " 
+			//+ KEY_CONTACTS + " TEXT" 
 			+ ");";
 	
 	public static void onCreate(SQLiteDatabase database) {
