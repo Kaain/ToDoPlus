@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -83,10 +84,7 @@ public class ToDoListActivity extends ListActivity {
 				}
 
 				@Override
-				public void onNothingSelected(AdapterView<?> parent) {
-					// TODO Auto-generated method stub
-					
-				}
+				public void onNothingSelected(AdapterView<?> parent) {}
 		});
 	}
 
@@ -114,6 +112,7 @@ public class ToDoListActivity extends ListActivity {
     
     @Override
     public void onListItemClick(ListView l, View v, int position, long id){
+    	Log.i(this.getClass().toString(), "onListItemClick: " +position);
     	Intent intent = new Intent(ToDoListActivity.this,
 				ToDoDetailsActivity.class);
     	Todo todo = (Todo)l.getItemAtPosition(position);
@@ -182,6 +181,7 @@ public class ToDoListActivity extends ListActivity {
     		public CheckBox favoriteCheckBox;
     	    public TextView todoName;
     	    public TextView expiredate;
+    	    public ImageButton deleteButton;
     	}
 
 
@@ -204,15 +204,17 @@ public class ToDoListActivity extends ListActivity {
 
 				viewHolder = new ViewHolder();
 				viewHolder.hiddenID = (TextView) convertView
-						.findViewById(R.id.hiddenId);
+						.findViewById(R.id.list_hiddenid);
 				viewHolder.finishedCheckBox = (CheckBox) convertView
-						.findViewById(R.id.finishedCheckbox);
+						.findViewById(R.id.list_finished);
 				viewHolder.favoriteCheckBox = (CheckBox) convertView
-						.findViewById(R.id.favoriteCheckbox);
+						.findViewById(R.id.list_favorite);
 				viewHolder.todoName = (TextView) convertView
-						.findViewById(R.id.todoNameText);
+						.findViewById(R.id.list_todoname);
 				viewHolder.expiredate = (TextView) convertView
-						.findViewById(R.id.expiredateText);
+						.findViewById(R.id.list_expiredate);
+				viewHolder.deleteButton = (ImageButton) convertView
+						.findViewById(R.id.list_delete_button);
 				convertView.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) convertView.getTag();
@@ -224,12 +226,14 @@ public class ToDoListActivity extends ListActivity {
 			Calendar expiredate = todo.getExpireDate();
 			if (expiredate != null) {
 				Calendar calNow = GregorianCalendar.getInstance();
-				if (expiredate.compareTo(calNow) == -1)
-					viewHolder.expiredate.setBackgroundColor(Color.rgb(205, 92,
-							92));
-				else
+				if (expiredate.compareTo(calNow) == -1){
+					viewHolder.expiredate.setBackgroundColor(Color.rgb(255, 255,
+							0));
+					viewHolder.expiredate.setTextColor(Color.BLACK);
+				}else{
 					viewHolder.expiredate
 							.setBackgroundColor(android.R.color.transparent);
+				}
 				viewHolder.expiredate.setText(todo.getExpireDateAsString());
 			}else{
 				viewHolder.expiredate.setText("");
@@ -246,6 +250,10 @@ public class ToDoListActivity extends ListActivity {
 					.setOnCheckedChangeListener(new UpdateDBOnCheckedChangeListener(id, TodoTable.KEY_FAVORITE));
 					
 			viewHolder.todoName.setText(name);
+			
+			viewHolder.deleteButton.setOnClickListener(null);
+			viewHolder.deleteButton.setOnClickListener(new DeleteOnClickListener(id));
+			viewHolder.deleteButton.setFocusable(false);
 			return convertView;
 		}
 	}
@@ -280,7 +288,23 @@ public class ToDoListActivity extends ListActivity {
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
-			Log.i(this.getClass().toString(), "UpdateDBOnCheckedChanged " +db.updateBooleanColumns(id, column, isChecked));
+			Log.i(this.getClass().toString(), "UpdateDBOnCheckedChanged " 
+				+db.updateBooleanColumns(id, column, isChecked));
 		}
+    }
+    private class DeleteOnClickListener implements OnClickListener{
+
+    	long id;
+    	
+    	public DeleteOnClickListener(long id) {
+			this.id = id;
+		}
+    	
+		@Override
+		public void onClick(View v) {
+			db.deleteTodo(id);
+			initListAdapter(sorting);
+		}
+    	
     }
 }
