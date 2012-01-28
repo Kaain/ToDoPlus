@@ -56,52 +56,69 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:id="@+id/details_date_layout"
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" 
-        android:clickable="true"
-        android:background="@drawable/clickable">
-        <TextView
-            android:id="@+id/details_date_name"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:id="@+id/details_date_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Expiry date"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <TextView
-            android:id="@+id/details_date_value"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/details_delete_date"
+            android:background="@drawable/clickable"
+            android:clickable="true"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/details_date_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Expiry date"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/details_date_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/details_delete_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/details_time_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" 
-        android:clickable="true"
-        android:background="@drawable/clickable">
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/delete" />
 
-        <TextView
-            android:id="@+id/details_time_name"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/details_time_layout"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <TextView
-            android:id="@+id/details_time_value"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/details_date_layout"
+            android:layout_below="@+id/details_date_layout"
+            android:background="@drawable/clickable"
+            android:clickable="true"
+            android:orientation="vertical" >
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/details_time_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Time"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/details_time_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"

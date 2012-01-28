@@ -17,11 +17,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -29,6 +31,7 @@ import android.widget.Toast;
 import cz.destil.settleup.gui.MultiSpinner;
 import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
+import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
@@ -40,7 +43,6 @@ public class ToDoDetailsActivity extends Activity{
 	private static final int TIME_DIALOG_ID = 2;
 	private static final int MODE_NEW = 10;
 	private static final int MODE_EDIT = 20;
-	private List<String> allContacts;
 	private TodoDatabase db;
 	private Todo actualTodo;
 	private int mode;
@@ -65,6 +67,7 @@ public class ToDoDetailsActivity extends Activity{
 	private TextView detailsTimeValue;
 	private Button detailsConfirm;
 	private Button detailsDelete;
+	private ImageButton detailsDeleteDate;
 	
 	private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
 
@@ -100,7 +103,6 @@ public class ToDoDetailsActivity extends Activity{
         
         db = new TodoDatabase(this);
 		db.open();
-		allContacts = getAllContacts();
 		
 		long todoID = getIntent().getLongExtra(ToDoListActivity.ARG_TODO_ID, -1);
 		if(todoID == -1){
@@ -181,19 +183,28 @@ public class ToDoDetailsActivity extends Activity{
 					}
 				});
 		detailsContacts = (MultiSpinner) findViewById(R.id.details_contacts);
-		detailsContacts.setItems(allContacts, "All Contacts", false,
+		detailsContacts.setItems(getAllContacts(), "Contacts", false,
 				new MultiSpinnerListener() {
 
 					@Override
 					public void onItemsSelected(boolean[] selected) {
 						Log.i(this.getClass().toString(), "contacts selected");
-
+						actualTodo.setContacts(detailsContacts.getSelectedContacts());
 					}
 				});
 
 		detailsdateLayout = (LinearLayout) findViewById(R.id.details_date_layout);
 		detailsDateValue = (TextView) findViewById(R.id.details_date_value);
 		initDatePicker();
+		detailsDeleteDate = (ImageButton) findViewById(R.id.details_delete_date);
+		detailsDeleteDate.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				detailsDateValue.setText("");
+				detailsTimeValue.setText("");
+			}
+		});
 
 		detailstimeLayout = (LinearLayout) findViewById(R.id.details_time_layout);
 		detailsTimeValue = (TextView) findViewById(R.id.details_time_value);
@@ -303,6 +314,7 @@ public class ToDoDetailsActivity extends Activity{
 		detailsDateValue.setText(date);
 		String time = DateHelper.getTimeAsString(actualTodo.getExpireDate());
 		detailsTimeValue.setText(time);
+		detailsContacts.setSelectedContacts(actualTodo.getContacts());
 	}
 	
 	private void initDatePicker(){
@@ -340,15 +352,16 @@ public class ToDoDetailsActivity extends Activity{
 		});
 	}
 	
-	private List<String> getAllContacts(){
-		List<String> contacts = new ArrayList<String>();
+	private List<Contact> getAllContacts(){
+		List<Contact> contacts = new ArrayList<Contact>();
 		Cursor people = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 		while(people.moveToNext()) {
 		   int idFieldColumnIndex = people.getColumnIndex(PhoneLookup._ID);
 		   long id = people.getLong(idFieldColumnIndex);
 		   int nameFieldColumnIndex = people.getColumnIndex(PhoneLookup.DISPLAY_NAME);
 		   String name = people.getString(nameFieldColumnIndex);
-		   contacts.add(name);
+		   Contact contact = new Contact(id, name);
+		   contacts.add(contact);
 		}
 		people.close();
 		return contacts;

@@ -1,5 +1,6 @@
 package cz.destil.settleup.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -12,11 +13,12 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import de.fhb.mobile.ToDoListAndroidApp.R;
+import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 
 public class MultiSpinner extends Spinner implements
         OnMultiChoiceClickListener, OnCancelListener {
 
-    private List<String> items;
+    private List<Contact> items;
     private boolean[] selected;
     private String defaultText;
     private MultiSpinnerListener listener;
@@ -73,8 +75,10 @@ public class MultiSpinner extends Spinner implements
     @Override
     public boolean performClick() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMultiChoiceItems(
-                items.toArray(new CharSequence[items.size()]), selected, this);
+        String[] contactArray = new String[items.size()];
+        for(int i = 0; i < items.size(); i++)
+        	contactArray[i] = items.get(i).getDisplayName();
+        builder.setMultiChoiceItems(contactArray, selected, this);
         builder.setPositiveButton(R.string.ok,
                 new DialogInterface.OnClickListener() {
 
@@ -88,7 +92,7 @@ public class MultiSpinner extends Spinner implements
         return true;
     }
 
-    public void setItems(List<String> items, String allText, boolean allSelected,
+    public void setItems(List<Contact> items, String allText, boolean allSelected,
             MultiSpinnerListener listener) {
         this.items = items;
         this.defaultText = allText;
@@ -104,8 +108,42 @@ public class MultiSpinner extends Spinner implements
                 android.R.layout.simple_spinner_item, new String[] { allText });
         setAdapter(adapter);
     }
+    
+    public void setSelectedContacts(List<Long> contacts) {
+    	StringBuffer spinnerBuffer = new StringBuffer();
+    	boolean nothingSelected = true;
+		for(int i = 0; i < items.size(); i++){
+			for(int j = 0; j < contacts.size(); j++){
+				if(items.get(i).getId() == contacts.get(j)){
+					selected[i] = true;
+					nothingSelected = false;
+					spinnerBuffer.append(items.get(i).getDisplayName());
+					spinnerBuffer.append(", ");
+				}
+			}
+		}
+		if(!nothingSelected)
+			spinnerBuffer.delete(spinnerBuffer.length() - 2, spinnerBuffer.length());
+		else
+			spinnerBuffer.append(defaultText);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item,
+                new String[] { spinnerBuffer.toString() });
+        Log.i(this.getClass().getName(), "SpinnerText = " +spinnerBuffer.toString());
+        setAdapter(adapter);
+	}
+    
+    public List<Long> getSelectedContacts(){
+    	List<Long> list = new ArrayList<Long>(0);
+    	for(int i = 0; i < items.size(); i++){
+    		if(selected[i])
+    			list.add(items.get(i).getId());
+    	}
+    	return list;
+    }
 
-    public interface MultiSpinnerListener {
+	public interface MultiSpinnerListener {
         public void onItemsSelected(boolean[] selected);
     }
+	
 }
