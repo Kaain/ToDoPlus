@@ -159,6 +159,7 @@ public class LoginActivity extends Activity {
 							errorField.setText("Falsche E-Mail/Falsches Password");
 							validMailInput = false;
 							validPasswordInput = false;
+							loginButton.setEnabled(false);
 						}
 					}
 					
@@ -197,7 +198,7 @@ public class LoginActivity extends Activity {
     private void processPasswordInput(String text) {
     	// if we have an invalid input, we display an error message...
 		if (text.length() < 6) {
-    		errorField.setText("Bitte geben Sie 6 Zeichen ein.");
+    		errorField.setText("Bitte geben Sie 6 Zeichen langes Password ein.");
     		validPasswordInput = false;
 		} else {
 			validPasswordInput = true;

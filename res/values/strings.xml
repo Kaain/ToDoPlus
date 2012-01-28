@@ -3,7 +3,6 @@
 
     <string name="hello">Hello World, ToDoActivity!</string>
     <string name="app_name">ToDoPlus</string>
-    <string name="app_name_login">ToDoPlus Login</string>
     <string name="hint_todoname">Name of Todo</string>
     <string name="ok">OK</string>
     <string name="newtodo">New Todo</string>

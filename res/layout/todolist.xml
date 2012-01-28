@@ -4,7 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
+
+    <TextView
+        android:id="@+id/alltodos_activityname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="All Todos"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
     <Spinner
         android:id="@+id/spinner_orderby"
         android:layout_width="match_parent"

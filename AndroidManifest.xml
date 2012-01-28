@@ -20,12 +20,13 @@
             android:label="ToDoDetails"
             android:name=".ToDoDetailsActivity">
             -->
-            <!--  android:label="@string/app_name_login"
-            android:name=".LoginActivity" >
+            <!-- android:label="@string/app_name"
+            	android:name=".LoginActivity"  >
             -->
             <activity
-            android:label="All Todos"
-            android:name=".ToDoListActivity">
+                android:label="All Todos"
+            	android:name=".ToDoListActivity"
+                >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,16 +34,16 @@
             </intent-filter>
         </activity>
         <activity 
-            android:label="All Todos"
+            android:label="@string/app_name"
             android:name=".ToDoListActivity">
         </activity>
         <activity 
-            android:label="Details for todo"
+            android:label="@string/app_name"
             android:name=".ToDoDetailsActivity">
         </activity>
         
         <activity 
-            android:label="All contacts with todos"
+            android:label="@string/app_name"
             android:name=".AllContactsActivity">
         </activity>
     </application>

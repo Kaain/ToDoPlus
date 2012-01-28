@@ -38,7 +38,6 @@ public class ToDoListActivity extends ListActivity {
 	
 	public static final int REQUEST_CODE_TODODETAILS = 1;
 	public static final int REQUEST_CODE_ALLCONTACTS = 2;
-	private static final int SORTING_FINISHED = 10;
 	private static final int SORTING_FAVORITE_DATE = 20;
 	private static final int SORTING_DATE_FAVORITE = 30;
 	private static final int MODE_ALLTODOS = 1000;
@@ -46,9 +45,12 @@ public class ToDoListActivity extends ListActivity {
 	public static final String ARG_TODO_ID = "todoObjectID";
 	private TodoDatabase db;
 	private int sorting;
-	private Spinner spinner_sortby;
 	private int mode;
 	private long contactId;
+	
+	// View
+	private Spinner spinner_sortby;
+	private TextView headline;
 	
     /** Called when the activity is first created. */
     @Override
@@ -57,11 +59,12 @@ public class ToDoListActivity extends ListActivity {
         setContentView(R.layout.todolist);
         Log.i(this.getClass().toString(), "onCreate");
         mode = MODE_ALLTODOS;
+        headline = (TextView) findViewById(R.id.alltodos_activityname);
         initSortSpinner();
         db = new TodoDatabase(this);
         db.open();
-        initTodos();
-        //initListAdapter(SORTING_FINISHED);
+        
+        //initTodos();
     }
     @Override
     public void onPause(){
@@ -90,7 +93,7 @@ public class ToDoListActivity extends ListActivity {
     private void initSortSpinner() {
     	Log.i(this.getClass().toString(), "initSortSpinner()");
     	spinner_sortby = (Spinner)findViewById(R.id.spinner_orderby);
-		CharSequence[] objects = { "by finished", "by importance + date", "by date + importance"};
+		CharSequence[] objects = { "sort by importance + date", "sort by date + importance"};
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, objects );
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner_sortby.setAdapter(adapter);
@@ -102,12 +105,9 @@ public class ToDoListActivity extends ListActivity {
 					Log.i(this.getClass().toString(), "Sortspinner select: pos= " +pos);
 					switch(pos){
 					case 0:
-						initListAdapter(SORTING_FINISHED);
-						break;
-					case 1:
 						initListAdapter(SORTING_FAVORITE_DATE);
 						break;
-					case 2:
+					case 1:
 						initListAdapter(SORTING_DATE_FAVORITE);
 						break;
 					}
@@ -137,15 +137,14 @@ public class ToDoListActivity extends ListActivity {
 		Log.i(this.getClass().toString(), "initListAdapterForAllTodosForContact()");
 		List<Todo> list = new ArrayList<Todo>(0);
 		
+		headline.setText("All Todos for Contact");
+		
 		switch (sorting) {
-		case SORTING_FINISHED:
+		case SORTING_FAVORITE_DATE:
 			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC", contactId);
 			break;
-		case SORTING_FAVORITE_DATE:
-			list = db.getAllTodosForContact(TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC", contactId);
-			break;
 		case SORTING_DATE_FAVORITE:
-			list = db.getAllTodosForContact(TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC", contactId);
+			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC", contactId);
 			break;
 		default:
 			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC", contactId);
@@ -159,15 +158,14 @@ public class ToDoListActivity extends ListActivity {
 		Log.i(this.getClass().toString(), "initListAdapterForAllTodos()");
 		List<Todo> list = new ArrayList<Todo>(0);
 		
+		headline.setText("All Todos");
+		
 		switch (sorting) {
-		case SORTING_FINISHED:
+		case SORTING_FAVORITE_DATE:
 			list = db.getAllTodos(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
 			break;
-		case SORTING_FAVORITE_DATE:
-			list = db.getAllTodos(TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC");
-			break;
 		case SORTING_DATE_FAVORITE:
-			list = db.getAllTodos(TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC" );
+			list = db.getAllTodos(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC" );
 			break;
 		default:
 			list = db.getAllTodos(TodoTable.KEY_FINISHED +" DESC");
@@ -192,6 +190,7 @@ public class ToDoListActivity extends ListActivity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+    	Log.i(this.getClass().toString(), "onCreateOptionsMenu");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
@@ -215,8 +214,8 @@ public class ToDoListActivity extends ListActivity {
     
     @Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+    	Log.i(this.getClass().toString(), "onPrepareOptionsMenu");
 		MenuItem allTodosItem = menu.findItem(R.id.menu_item_all_todos);
-		allTodosItem.setEnabled(false);
 		return true;
 	}
     
@@ -228,6 +227,7 @@ public class ToDoListActivity extends ListActivity {
         	startCreateActivity();
         	return true;
         case R.id.menu_item_all_todos:
+        	initListAdapterForAllTodos();
             return true;
         case R.id.menu_item_all_contacts_with_todos:
         	startAllContactActivity();
