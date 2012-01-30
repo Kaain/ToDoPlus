@@ -95,7 +95,7 @@ public class ToDoListActivity extends ListActivity {
     private void initSortSpinner() {
     	Log.i(this.getClass().toString(), "initSortSpinner()");
     	spinner_sortby = (Spinner)findViewById(R.id.spinner_orderby);
-		CharSequence[] objects = { "sort by importance + date", "sort by date + importance"};
+		CharSequence[] objects = { "sort by important + date", "sort by date + important"};
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, objects );
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner_sortby.setAdapter(adapter);
@@ -136,7 +136,7 @@ public class ToDoListActivity extends ListActivity {
     }
 	
 	private void initListAdapterForAllTodosForContact(){
-		Log.i(this.getClass().toString(), "initListAdapterForAllTodosForContact()");
+		Log.i(this.getClass().toString(), "initListAdapterForAllTodosForContact() - " +contact.getDisplayName());
 		List<Todo> list = new ArrayList<Todo>(0);
 		
 		headline.setText("All Todos for " +contact.getDisplayName());
