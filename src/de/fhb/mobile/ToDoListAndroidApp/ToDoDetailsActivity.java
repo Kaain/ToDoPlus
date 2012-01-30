@@ -30,6 +30,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import cz.destil.settleup.gui.MultiSpinner;
 import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
+import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
@@ -183,7 +184,7 @@ public class ToDoDetailsActivity extends Activity{
 					}
 				});
 		detailsContacts = (MultiSpinner) findViewById(R.id.details_contacts);
-		detailsContacts.setItems(getAllContacts(), "Contacts", false,
+		detailsContacts.setItems(AndroidContactsHelper.getAllContacts(this.getContentResolver()), "Contacts", false,
 				new MultiSpinnerListener() {
 
 					@Override

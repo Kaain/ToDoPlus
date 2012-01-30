@@ -29,6 +29,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
+import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
@@ -46,7 +48,7 @@ public class ToDoListActivity extends ListActivity {
 	private TodoDatabase db;
 	private int sorting;
 	private int mode;
-	private long contactId;
+	private Contact contact;
 	
 	// View
 	private Spinner spinner_sortby;
@@ -137,17 +139,17 @@ public class ToDoListActivity extends ListActivity {
 		Log.i(this.getClass().toString(), "initListAdapterForAllTodosForContact()");
 		List<Todo> list = new ArrayList<Todo>(0);
 		
-		headline.setText("All Todos for Contact");
+		headline.setText("All Todos for " +contact.getDisplayName());
 		
 		switch (sorting) {
 		case SORTING_FAVORITE_DATE:
-			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC", contactId);
+			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_FAVORITE +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC", contact.getId());
 			break;
 		case SORTING_DATE_FAVORITE:
-			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC", contactId);
+			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC, " +TodoTable.KEY_EXPIREDATE +" ASC, " +TodoTable.KEY_FAVORITE +" DESC", contact.getId());
 			break;
 		default:
-			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC", contactId);
+			list = db.getAllTodosForContact(TodoTable.KEY_FINISHED +" DESC", contact.getId());
 		}
     	ArrayAdapter<Todo> sadapter = new TodoAdapter(this,R.layout.listelement, list);
     	// setze den Adapter auf die Listenansicht
@@ -203,9 +205,10 @@ public class ToDoListActivity extends ListActivity {
 		switch (requestCode) {
 		case (REQUEST_CODE_ALLCONTACTS):
 			if (resultCode == Activity.RESULT_OK) { 
+				long contactId = data.getLongExtra(AllContactsActivity.ARG_CONTACT_ID,
+						-1);
 				mode = MODE_ALLTODOS_FOR_CONTACT;
-			contactId = data.getLongExtra(AllContactsActivity.ARG_CONTACT_ID,
-					-1);
+			contact = AndroidContactsHelper.getContact(getContentResolver(), contactId);
 			}
 			break;
 		}
@@ -215,7 +218,6 @@ public class ToDoListActivity extends ListActivity {
     @Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
     	Log.i(this.getClass().toString(), "onPrepareOptionsMenu");
-		MenuItem allTodosItem = menu.findItem(R.id.menu_item_all_todos);
 		return true;
 	}
     

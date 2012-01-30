@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
 import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
@@ -44,7 +45,7 @@ public class AllContactsActivity extends ListActivity{
 		List<Long> contactsLong = db.getAllContacts();
 		
 		ContactAdapter adapter = new ContactAdapter(this,
-				android.R.layout.simple_list_item_1, getContacts(contactsLong));
+				android.R.layout.simple_list_item_1, AndroidContactsHelper.getContacts(getContentResolver(), contactsLong));
 		setListAdapter(adapter);
 	}
 	
@@ -86,23 +87,6 @@ public class AllContactsActivity extends ListActivity{
     	
 		finish();
     }
-	
-	private List<Contact> getContacts(List<Long> contactIds){
-		List<Contact> contacts = new ArrayList<Contact>();
-		Cursor people = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		while(people.moveToNext()) {
-		   int iId = people.getColumnIndex(PhoneLookup._ID);
-		   long id = people.getLong(iId);
-		   if(contactIds.contains(id)){
-			   int iName = people.getColumnIndex(PhoneLookup.DISPLAY_NAME);
-			   String name = people.getString(iName);
-			   Contact contact = new Contact(id, name);
-			   contacts.add(contact);
-		   }
-		}
-		people.close();
-		return contacts;
-	}
 
 	private class ContactAdapter extends ArrayAdapter<Contact> {
 
