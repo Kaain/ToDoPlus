@@ -31,7 +31,7 @@ public class LoggerFactory {
 				Class loggerklass = Class.forName(LOG4J_LOGGER);
 				Logger loggerobj = (Logger) loggerklass.newInstance();
 				loggerobj.setLoggingKlass(klass);
-				
+
 				return loggerobj;
 			} catch (Throwable t2) {
 				logger.info("we could neither load the android nor the log4j logger. Use console logging.");

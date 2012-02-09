@@ -14,13 +14,14 @@ public class ListHelper {
 			return "";
 
 	}
-	public static List<Long> stringToList(String string){
-		if(string.isEmpty())
+
+	public static List<Long> stringToList(String string) {
+		if (string.isEmpty())
 			return new ArrayList<Long>(0);
-		
+
 		String[] stringA = string.split("\\|");
 		List<Long> list = new ArrayList<Long>();
-		for(int i = 0; i < stringA.length; i++)
+		for (int i = 0; i < stringA.length; i++)
 			list.add(Long.valueOf(stringA[i]));
 		return list;
 	}

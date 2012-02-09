@@ -18,6 +18,7 @@
             android:id="@+id/message_mail"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
             android:hint="eMail" />
 
         <EditText

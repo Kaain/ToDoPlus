@@ -1,13 +1,13 @@
 package de.fhb.mobile.ToDoListAndroidApp.communication;
 
-import android.content.Context;
-import android.content.Intent;
-
-import de.fhb.mobile.shared.logging.Logger;
-import de.fhb.mobile.shared.logging.LoggerFactory;
-
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.Provider;
+import java.security.Security;
+import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -17,16 +17,15 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Security;
-import java.util.Properties;
+
+import android.content.Context;
+import android.content.Intent;
+import de.fhb.mobile.shared.logging.Logger;
+import de.fhb.mobile.shared.logging.LoggerFactory;
 
 // http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-ap/2033124#2033124
 public class GmailSender extends javax.mail.Authenticator {
-	
+
 	public static final String RECIPIENTS_SEPARATOR = ",";
 
 	private String mailhost = "smtp.gmail.com";
@@ -62,10 +61,10 @@ public class GmailSender extends javax.mail.Authenticator {
 
 	public synchronized void sendEmail(String subject, String body,
 			String sender, String recipients) throws Exception {
-		
-		logger.info("sending email to " + recipients + " with subject " + subject
-				+ ": " + body);
-		
+
+		logger.info("sending email to " + recipients + " with subject "
+				+ subject + ": " + body);
+
 		try {
 			MimeMessage message = new MimeMessage(session);
 			DataHandler handler = new DataHandler(new ByteArrayDataSource(
@@ -138,8 +137,8 @@ public class GmailSender extends javax.mail.Authenticator {
 	public static void composeEmail(Context context, String subject,
 			String body, String sender, String recipients) {
 
-		logger.info("composing email to " + recipients + " with subject " + subject
-				+ ": " + body);
+		logger.info("composing email to " + recipients + " with subject "
+				+ subject + ": " + body);
 
 		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 

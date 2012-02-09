@@ -1,11 +1,11 @@
 package de.fhb.mobile.ToDoListAndroidApp.communication;
 
-import de.fhb.mobile.shared.logging.Logger;
-import de.fhb.mobile.shared.logging.LoggerFactory;
 import android.content.Context;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
+import de.fhb.mobile.shared.logging.Logger;
+import de.fhb.mobile.shared.logging.LoggerFactory;
 
 public class MyPhoneStateListener extends PhoneStateListener {
 
@@ -34,7 +34,8 @@ public class MyPhoneStateListener extends PhoneStateListener {
 			msg = "call state is idle";
 			// "CALL_STATE_OFFHOOK": Device call state: Off-hook. At least one
 			// call exists that is dialing, active, or on hold, and no calls are
-			// ringing or waiting, see http://developer.android.com/reference/android/telephony/TelephonyManager.html#CALL_STATE_OFFHOOK
+			// ringing or waiting, see
+			// http://developer.android.com/reference/android/telephony/TelephonyManager.html#CALL_STATE_OFFHOOK
 		} else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
 			msg = "call state is offhook";
 		} else {

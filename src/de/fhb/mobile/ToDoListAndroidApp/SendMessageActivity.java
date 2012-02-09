@@ -17,7 +17,6 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import de.fhb.mobile.ToDoListAndroidApp.R;
 import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
 import de.fhb.mobile.ToDoListAndroidApp.communication.GmailSender;
 import de.fhb.mobile.ToDoListAndroidApp.communication.MyPhoneStateListener;
@@ -31,48 +30,62 @@ import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 import de.fhb.mobile.shared.logging.Logger;
 import de.fhb.mobile.shared.logging.LoggerFactory;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SendMessageActivity.
+ */
 public class SendMessageActivity extends Activity {
 
-	/**
-	 * the logger
-	 */
+	/** the logger. */
 	protected static Logger logger = LoggerFactory
 			.getLogger(SendMessageActivity.class);
 
 	/**
 	 * constants for identifying the intents used for calling back this activity
-	 * with status notifications
+	 * with status notifications.
 	 */
 	public static final String SMS_SENT = SendMessageActivity.class.getName()
 			+ ".SMS_SENT";
+
+	/** The Constant SMS_DELIVERED. */
 	public static final String SMS_DELIVERED = SendMessageActivity.class
 			.getName() + ".SMS_DELIVERED";
 
-	/**
-	 * the View elements
-	 */
+	/** the View elements. */
 	private TextView contactName;
+
+	/** The contact mail. */
 	private EditText contactMail;
+
+	/** The contact number. */
 	private EditText contactNumber;
+
+	/** The msg content. */
 	private EditText msgContent;
 
-	/**
-	 * two receivers for tracking sms sending
-	 */
+	/** two receivers for tracking sms sending. */
 	private BroadcastReceiver smsSendingMonitor;
+
+	/** The sms delivery monitor. */
 	private BroadcastReceiver smsDeliveryMonitor;
 
-	/**
-	 * the phone state listener
-	 */
+	/** the phone state listener. */
 	private PhoneStateListener phoneStateListener;
-	
+
+	/** The db. */
 	private TodoDatabase db;
+
+	/** The actual todo. */
 	private Todo actualTodo;
+
+	/** The actual contact. */
 	private Contact actualContact;
 
 	/**
-	 * onCreate
+	 * onCreate.
+	 * 
+	 * @param savedInstanceState
+	 *            the saved instance state
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -81,13 +94,16 @@ public class SendMessageActivity extends Activity {
 
 		db = new TodoDatabase(this);
 		db.open();
-		
-		long todoID = getIntent().getLongExtra(ToDoDetailsActivity.ARG_TODO_ID, -1);
-		long contactID = getIntent().getLongExtra(ShowContactsActivity.ARG_CONTACT_ID, -2);
-		
+
+		long todoID = getIntent().getLongExtra(ToDoDetailsActivity.ARG_TODO_ID,
+				-1);
+		long contactID = getIntent().getLongExtra(
+				ShowContactsActivity.ARG_CONTACT_ID, -2);
+
 		actualTodo = db.getTodoById(todoID);
-		actualContact = AndroidContactsHelper.getContact(getContentResolver(), contactID);
-		
+		actualContact = AndroidContactsHelper.getContact(getContentResolver(),
+				contactID);
+
 		// register a phonestatelistener
 		this.phoneStateListener = new MyPhoneStateListener(this);
 		((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE))
@@ -96,27 +112,30 @@ public class SendMessageActivity extends Activity {
 
 		initViewComponents();
 	}
-	
+
+	/**
+	 * Inits the view components.
+	 */
 	private void initViewComponents() {
-		
-		contactName = (TextView)findViewById(R.id.message_contactName);
-		contactName.setText("Message for " +actualContact.getDisplayName());
-		
-		contactMail = (EditText)findViewById(R.id.message_mail);
+
+		contactName = (TextView) findViewById(R.id.message_contactName);
+		contactName.setText("Message for " + actualContact.getDisplayName());
+
+		contactMail = (EditText) findViewById(R.id.message_mail);
 		contactMail.setText(actualContact.getMail());
-		
-		contactNumber = (EditText)findViewById(R.id.message_phoneNumber);
+
+		contactNumber = (EditText) findViewById(R.id.message_phoneNumber);
 		contactNumber.setText(actualContact.getPhoneNumber());
-		
+
 		msgContent = (EditText) findViewById(R.id.messageText);
 		msgContent.setText(getDefaultMessage());
-		
+
 		// then set onClick listeners on the action buttons
 		findViewById(R.id.sendSMSAction).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-							sendSMS(getNumber(), getMessageContent());
+						sendSMS(getNumber(), getMessageContent());
 					}
 				});
 
@@ -125,7 +144,7 @@ public class SendMessageActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 
-							sendEmail(getMail(), getMessageContent());
+						sendEmail(getMail(), getMessageContent());
 					}
 				});
 
@@ -137,43 +156,68 @@ public class SendMessageActivity extends Activity {
 					}
 				});
 	}
-	
-	private String getDefaultMessage(){
+
+	/**
+	 * Gets the default message.
+	 * 
+	 * @return the default message
+	 */
+	private String getDefaultMessage() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("Todoname: " +actualTodo.getName());
-		sb.append("\nDescription: " +actualTodo.getDescription());
-		sb.append("\nExpire at: " +actualTodo.getExpireDateAsString());
-		if(actualTodo.isFinished()) 
+		sb.append("Todoname: " + actualTodo.getName());
+		sb.append("\nDescription: " + actualTodo.getDescription());
+		sb.append("\nExpires at: " + actualTodo.getExpireDateAsString());
+		if (actualTodo.isFinished())
 			sb.append("\nis finished: yes");
-		else 
+		else
 			sb.append("\nis finished: no");
 		return sb.toString();
 	}
-	
+
+	/**
+	 * Gets the mail address.
+	 * 
+	 * @return the mail
+	 */
 	protected String getMail() {
 		return contactMail.getText().toString();
 	}
 
+	/**
+	 * Gets the number.
+	 * 
+	 * @return the number
+	 */
 	private String getNumber() {
 		return contactNumber.getText().toString();
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onRestart()
+	 */
 	@Override
-    public void onRestart(){
-    	Log.i(this.getClass().toString(), "onRestart");
-    	super.onRestart();
-    	db.open();
-    }
-	
+	public void onRestart() {
+		Log.i(this.getClass().toString(), "onRestart");
+		super.onRestart();
+		db.open();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onPause()
+	 */
 	@Override
-    public void onPause(){
-    	Log.i(this.getClass().toString(), "onPause");
-    	super.onPause();
-    	db.close();
-    }
+	public void onPause() {
+		Log.i(this.getClass().toString(), "onPause");
+		super.onPause();
+		db.close();
+	}
 
 	/**
-	 * on finish we need to unregister the receivers
+	 * on finish we need to unregister the receivers.
 	 */
 	@Override
 	public void finish() {
@@ -191,17 +235,22 @@ public class SendMessageActivity extends Activity {
 		super.finish();
 	}
 
-
 	/**
-	 * get the content
+	 * get the content.
+	 * 
+	 * @return the message content
 	 */
 	protected String getMessageContent() {
 		return msgContent.getText().toString();
 	}
 
 	/**
-	 * send an sms
-	 * @throws SMSException 
+	 * send an sms.
+	 * 
+	 * @param receiver
+	 *            the receiver
+	 * @param message
+	 *            the message
 	 */
 	protected void sendSMS(String receiver, String message) {
 
@@ -245,7 +294,12 @@ public class SendMessageActivity extends Activity {
 	}
 
 	/**
-	 * compose an sms
+	 * compose an sms.
+	 * 
+	 * @param receiver
+	 *            the receiver
+	 * @param message
+	 *            the message
 	 */
 	// http://snipt.net/Martin/android-intent-usage/
 	protected void composeSMS(String receiver, String message) {
@@ -260,13 +314,14 @@ public class SendMessageActivity extends Activity {
 	}
 
 	/**
-	 * send and email using the gmail emailer
+	 * send and email using the gmail emailer.
 	 * 
 	 * @param receiver
+	 *            the receiver
 	 * @param message
-	 * @throws MailException 
+	 *            the message
 	 */
-	protected void sendEmail(String receiver, String message){
+	protected void sendEmail(String receiver, String message) {
 
 		try {
 			if (receiver.isEmpty())
@@ -292,11 +347,16 @@ public class SendMessageActivity extends Activity {
 			toast.show();
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
-	 * compose an email using some app on the device
+	 * compose an email using some app on the device.
+	 * 
+	 * @param receiver
+	 *            the receiver
+	 * @param message
+	 *            the message
 	 */
 	protected void composeEmail(String receiver, String message) {
 		GmailSender.composeEmail(this, "new email", message,
@@ -304,7 +364,10 @@ public class SendMessageActivity extends Activity {
 	}
 
 	/**
-	 * place a call
+	 * place a call.
+	 * 
+	 * @param receiver
+	 *            the receiver
 	 */
 	protected void placeCall(String receiver) {
 		String url = "tel:" + receiver;
