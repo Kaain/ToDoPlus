@@ -330,6 +330,15 @@ public class ToDoDetailsActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				try {
+					updateDatabase();
+				} catch (UpdateException e) {
+					makeToast(e.getMessage());
+					e.printStackTrace();
+				} catch (CreateException e) {
+					makeToast(e.getMessage());
+					e.printStackTrace();
+				}
 				Intent intent = new Intent(ToDoDetailsActivity.this,
 						ShowContactsActivity.class);
 				intent.putExtra(ARG_TODO_ID, actualTodo.getId());
