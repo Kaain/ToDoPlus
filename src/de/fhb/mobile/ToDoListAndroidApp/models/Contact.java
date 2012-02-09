@@ -6,6 +6,8 @@ public class Contact {
 	private long id;
 	private String displayName;
 	private List<Todo> todos;
+	private String phoneNumber;
+	private String mail;
 	
 	public Contact() {}
 	
@@ -51,6 +53,22 @@ public class Contact {
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String eMail) {
+		this.mail = eMail;
+	}
+
 	@Override
 	public String toString(){
 		return this.displayName;

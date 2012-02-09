@@ -109,6 +109,8 @@ public class MultiSpinner extends Spinner implements
         setAdapter(adapter);
     }
     
+    /* New methods */
+    
     public void setSelectedContacts(List<Long> contacts) {
     	StringBuffer spinnerBuffer = new StringBuffer();
     	boolean nothingSelected = true;

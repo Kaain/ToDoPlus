@@ -30,9 +30,9 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
+import de.fhb.mobile.ToDoListAndroidApp.exceptions.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoTable;
 
@@ -205,7 +205,7 @@ public class ToDoListActivity extends ListActivity {
 		switch (requestCode) {
 		case (REQUEST_CODE_ALLCONTACTS):
 			if (resultCode == Activity.RESULT_OK) { 
-				long contactId = data.getLongExtra(AllContactsActivity.ARG_CONTACT_ID,
+				long contactId = data.getLongExtra(ShowContactsActivity.ARG_CONTACT_ID,
 						-1);
 				mode = MODE_ALLTODOS_FOR_CONTACT;
 			contact = AndroidContactsHelper.getContact(getContentResolver(), contactId);
@@ -242,7 +242,7 @@ public class ToDoListActivity extends ListActivity {
     private void startAllContactActivity() {
     	Log.i(this.getClass().toString(), "startAllContactActivity()");
     	Intent intent = new Intent(ToDoListActivity.this,
-    			AllContactsActivity.class);
+    			ShowContactsActivity.class);
 		startActivityForResult(intent, REQUEST_CODE_ALLCONTACTS);
 	}
 

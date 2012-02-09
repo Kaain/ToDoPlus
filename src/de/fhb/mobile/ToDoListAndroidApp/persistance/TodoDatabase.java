@@ -12,6 +12,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 import de.fhb.mobile.ToDoListAndroidApp.commons.ListHelper;
+import de.fhb.mobile.ToDoListAndroidApp.exceptions.CreateException;
+import de.fhb.mobile.ToDoListAndroidApp.exceptions.UpdateException;
 import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 

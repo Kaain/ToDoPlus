@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/message_contactName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+            android:id="@+id/message_mail"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="eMail" />
+
+        <EditText
+            android:id="@+id/message_phoneNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:hint="Phone number" >
+        </EditText>
+
+        <EditText
+            android:id="@+id/messageText"
+            android:layout_width="fill_parent"
+            android:layout_height="182dp"
+            android:gravity="left|top"
+            android:hint="Message"
+            android:imeOptions="actionDone"
+            android:padding="5dip"
+            android:textSize="14dip" >
+
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_weight="0.1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/sendSMSAction"
+                android:layout_width="fill_parent"
+                android:layout_height="55dip"
+                android:layout_weight="0.25"
+                android:text="Send SMS"
+                android:textSize="10dip" >
+            </Button>
+
+            <Button
+                android:id="@+id/sendEmailAction"
+                android:layout_width="fill_parent"
+                android:layout_height="55dip"
+                android:layout_weight="0.25"
+                android:text="Send mail"
+                android:textSize="10dip" >
+            </Button>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/placeCallAction"
+            android:layout_width="fill_parent"
+            android:layout_height="55dip"
+            android:text="Call"
+            android:textSize="10dip" >
+        </Button>
+    </LinearLayout>
+
+</RelativeLayout>

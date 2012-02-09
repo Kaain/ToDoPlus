@@ -1,4 +1,4 @@
-package de.fhb.mobile.ToDoListAndroidApp.persistance;
+package de.fhb.mobile.ToDoListAndroidApp.exceptions;
 
 public class CreateException extends Exception{
 	

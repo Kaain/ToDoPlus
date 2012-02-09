@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -32,11 +33,11 @@ import cz.destil.settleup.gui.MultiSpinner;
 import cz.destil.settleup.gui.MultiSpinner.MultiSpinnerListener;
 import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
+import de.fhb.mobile.ToDoListAndroidApp.exceptions.CreateException;
+import de.fhb.mobile.ToDoListAndroidApp.exceptions.UpdateException;
 import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
-import de.fhb.mobile.ToDoListAndroidApp.persistance.UpdateException;
 
 public class ToDoDetailsActivity extends Activity{
 	
@@ -44,6 +45,8 @@ public class ToDoDetailsActivity extends Activity{
 	private static final int TIME_DIALOG_ID = 2;
 	private static final int MODE_NEW = 10;
 	private static final int MODE_EDIT = 20;
+	public static final int REQUEST_CODE_SENDMESSAGES = 1000;
+	public static final String ARG_TODO_ID = "todoObjectID";
 	private TodoDatabase db;
 	private Todo actualTodo;
 	private int mode;
@@ -68,6 +71,7 @@ public class ToDoDetailsActivity extends Activity{
 	private TextView detailsTimeValue;
 	private Button detailsConfirm;
 	private Button detailsDelete;
+	private Button detailsSendMessages;
 	private ImageButton detailsDeleteDate;
 	
 	private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
@@ -125,6 +129,13 @@ public class ToDoDetailsActivity extends Activity{
 		Log.i(this.getClass().toString(), "onDestroy");
 		super.onDestroy();
 	}
+	
+	@Override
+    public void onRestart(){
+    	Log.i(this.getClass().toString(), "onRestart");
+    	super.onRestart();
+    	db.open();
+    }
 	
 	private void initViewComponents() {
 		Log.i(this.getClass().toString(), "initViewComponents()");
@@ -227,6 +238,18 @@ public class ToDoDetailsActivity extends Activity{
 					makeToast(e.getMessage());
 					e.printStackTrace();
 				}
+			}
+		});
+		
+		detailsSendMessages = (Button) findViewById(R.id.details_send_messages);
+		detailsSendMessages.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ToDoDetailsActivity.this,
+		    			ShowContactsActivity.class);
+				intent.putExtra(ARG_TODO_ID, actualTodo.getId());
+				startActivityForResult(intent, REQUEST_CODE_SENDMESSAGES);
 			}
 		});
 		
@@ -352,21 +375,7 @@ public class ToDoDetailsActivity extends Activity{
 			}
 		});
 	}
-	
-	private List<Contact> getAllContacts(){
-		List<Contact> contacts = new ArrayList<Contact>();
-		Cursor people = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		while(people.moveToNext()) {
-		   int idFieldColumnIndex = people.getColumnIndex(PhoneLookup._ID);
-		   long id = people.getLong(idFieldColumnIndex);
-		   int nameFieldColumnIndex = people.getColumnIndex(PhoneLookup.DISPLAY_NAME);
-		   String name = people.getString(nameFieldColumnIndex);
-		   Contact contact = new Contact(id, name);
-		   contacts.add(contact);
-		}
-		people.close();
-		return contacts;
-	}
+
 	private void updateDatabase() throws UpdateException, CreateException {
 		Log.i(this.getClass().toString(), "updateDatabase()");
 		if(!detailsDateValue.getText().toString().isEmpty())
