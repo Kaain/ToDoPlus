@@ -35,7 +35,9 @@ import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
  */
 public class ServerCommunicationREST implements IServerCommunicationREST{
 	
-	private static final String HOST_NAME = "localhost";
+	//private static final String HOST_NAME = "localhost";
+	private static final String HOST_NAME = "10.0.2.2";
+	
 	private static final String PORT = "8080";
 	private static final String PROJECT = "ToDoListAndroidServer";
 	private static final String HOST_ADDRESS = "http://"+HOST_NAME+":"+PORT+"/"+PROJECT;
@@ -51,7 +53,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 		boolean isAuthenticate = false;
 		HttpParams params = new BasicHttpParams();
 		params.setParameter("username", username);
-		params.setParameter("passwprd", password);
+		params.setParameter("password", password);
 		
 		try {
 			json = this.sendRequest(url, "POST",params);

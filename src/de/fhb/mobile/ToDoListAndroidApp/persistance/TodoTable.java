@@ -28,6 +28,9 @@ public class TodoTable {
 
 	/** The Constant KEY_EXPIREDATE. */
 	public static final String KEY_EXPIREDATE = "expiredate";
+	
+	/** The Constant KEY_LASTUPDATED. */
+	public static final String KEY_LASTUPDATED = "lastupdated";
 
 	/** The Constant DATABASE_CREATE_TODO. */
 	private static final String DATABASE_CREATE_TODO = "CREATE TABLE IF  NOT EXISTS "
@@ -41,8 +44,9 @@ public class TodoTable {
 			+ " TEXT, "
 			+ KEY_FINISHED
 			+ " INTEGER, "
-			+ KEY_FAVORITE + " INTEGER, " + KEY_EXPIREDATE + " INTEGER "
-			// + KEY_CONTACTS + " TEXT"
+			+ KEY_FAVORITE + " INTEGER, " 
+			+ KEY_EXPIREDATE + " INTEGER, "
+			+ KEY_LASTUPDATED + " INTEGER "
 			+ ");";
 
 	/**

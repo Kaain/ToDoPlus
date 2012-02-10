@@ -2,6 +2,7 @@ package de.fhb.mobile.ToDoListAndroidApp.persistance;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -81,6 +82,7 @@ public class TodoDatabase {
 		values.put(TodoTable.KEY_FAVORITE, favorite);
 		values.put(TodoTable.KEY_EXPIREDATE, (cal == null) ? 0 : cal.getTime()
 				.getTime());
+		values.put(TodoTable.KEY_LASTUPDATED, DateHelper.getActualTime());
 
 		long rowid = database.insert(TodoTable.TABLE_TODO, null, values);
 		createTodoToContact(rowid, contacts);
@@ -141,7 +143,7 @@ public class TodoDatabase {
 	}
 
 	/**
-	 * Gets all contacts.
+	 * Gets all contact ids.
 	 * 
 	 * @return all contacts
 	 */
@@ -163,7 +165,7 @@ public class TodoDatabase {
 	}
 
 	/**
-	 * Gets all contacts for the todo.
+	 * Gets all contact ids for the todo.
 	 * 
 	 * @param todoId
 	 *            the todo id
@@ -203,6 +205,7 @@ public class TodoDatabase {
 		final int finishedIndex;
 		final int expiredateIndex;
 		final int descriptionIndex;
+		final int lastupdatedIndex;
 		List<Todo> list = new ArrayList<Todo>();
 
 		Cursor cursor = database.query(TodoTable.TABLE_TODO, null, null, null,
@@ -214,6 +217,7 @@ public class TodoDatabase {
 		finishedIndex = cursor.getColumnIndex(TodoTable.KEY_FINISHED);
 		favoriteIndex = cursor.getColumnIndex(TodoTable.KEY_FAVORITE);
 		expiredateIndex = cursor.getColumnIndex(TodoTable.KEY_EXPIREDATE);
+		lastupdatedIndex = cursor.getColumnIndex(TodoTable.KEY_LASTUPDATED);
 
 		while (cursor.moveToNext()) {
 			long id = cursor.getLong(idIndex);
@@ -233,6 +237,7 @@ public class TodoDatabase {
 						.getCalendarByLong(expiredate));
 
 			returnTodo.setContacts(getAllContacts(id));
+			returnTodo.setLastUpdated(cursor.getLong(lastupdatedIndex));
 			list.add(returnTodo);
 		}
 		cursor.close();
@@ -376,6 +381,7 @@ public class TodoDatabase {
 		if (column == TodoTable.KEY_FAVORITE)
 			values.put(TodoTable.KEY_FAVORITE, isChecked);
 
+		values.put(TodoTable.KEY_LASTUPDATED, DateHelper.getActualTime());
 		int rowsUpdated = database.update(TodoTable.TABLE_TODO, values,
 				TodoTable.KEY_ID + "=?", new String[] { String.valueOf(id) });
 
@@ -414,6 +420,7 @@ public class TodoDatabase {
 		values.put(TodoTable.KEY_FAVORITE, favorite);
 		values.put(TodoTable.KEY_EXPIREDATE, (cal == null) ? 0 : cal.getTime()
 				.getTime());
+		values.put(TodoTable.KEY_LASTUPDATED, DateHelper.getActualTime());
 		updateTodoToContact(id, contacts);
 		int rowsUpdated = database.update(TodoTable.TABLE_TODO, values,
 				TodoTable.KEY_ID + "=?", new String[] { String.valueOf(id) });

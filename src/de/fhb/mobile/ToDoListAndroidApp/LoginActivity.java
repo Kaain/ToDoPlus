@@ -1,11 +1,14 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
+import de.fhb.mobile.ToDoListAndroidApp.communication.IServerCommunicationREST;
+import de.fhb.mobile.ToDoListAndroidApp.communication.ServerCommunicationREST;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,6 +53,8 @@ public class LoginActivity extends Activity {
 
 	/** The valid password input. */
 	private boolean validPasswordInput = true;
+	
+	private IServerCommunicationREST server;
 
 	/**
 	 * Called when the activity is first created.
@@ -64,6 +69,8 @@ public class LoginActivity extends Activity {
 		// set the list view as content view
 		setContentView(R.layout.login);
 
+		server = new ServerCommunicationREST();
+		
 		// init the ui elements
 		errorField = (TextView) findViewById(R.id.errorField);
 		initMailField();
@@ -175,8 +182,10 @@ public class LoginActivity extends Activity {
 					protected Object doInBackground(Void... params) {
 						try {
 							Thread.sleep(1500);
-							if (mailInputValue.equals("t@t.t")
-									&& passwordInputValue.equals("123456")) {
+							boolean isAuthenticated = server.authentifactation(mailInputValue, passwordInputValue);
+							/*if (mailInputValue.equals("t@t.t")
+									&& passwordInputValue.equals("123456"))*/
+							if(isAuthenticated){
 								loadTodos();
 								startActivity(new Intent(LoginActivity.this,
 										ToDoListActivity.class));

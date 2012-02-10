@@ -31,6 +31,9 @@ public class Todo {
 
 	/** The contacts. */
 	private List<Long> contacts;
+	
+	/** The last updated. */
+	private long lastUpdated;
 
 	/**
 	 * Instantiates a new todo.
@@ -220,6 +223,14 @@ public class Todo {
 	 */
 	public void setContacts(List<Long> contacts) {
 		this.contacts = contacts;
+	}
+
+	public long getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(long lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 	/*

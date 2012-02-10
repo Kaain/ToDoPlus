@@ -99,4 +99,8 @@ public class DateHelper {
 		DateFormat format = new SimpleDateFormat("MM-dd-yyyy | HH:mm");
 		return format.format(date);
 	}
+	
+	public static long getActualTime(){
+		return GregorianCalendar.getInstance().getTime().getTime();
+	}
 }

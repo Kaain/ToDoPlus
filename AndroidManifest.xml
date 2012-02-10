@@ -25,13 +25,13 @@
             android:label="ToDoDetails"
             android:name=".ToDoDetailsActivity">
             -->
-            <!-- android:label="@string/app_name"
-            	android:name=".LoginActivity"  >
+            <!--  
+            	android:label="All Todos"
+            	android:name=".ToDoListActivity" >
             -->
             <activity
-                android:label="All Todos"
-            	android:name=".ToDoListActivity"
-                >
+                android:label="@string/app_name"
+            	android:name=".LoginActivity">
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
