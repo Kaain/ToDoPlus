@@ -27,8 +27,9 @@ public interface IServerCommunicationREST {
 	 * synchronize local todolist with server-todolist
 	 * 
 	 * @param todoList
+	 * @return 
 	 */
-	public void synchronize(List<Todo> todoList);
+	public boolean synchronize(List<Todo> todoList);
 	
 	/**
 	 * get all todos from Server.
