@@ -1,11 +1,5 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
-import java.io.IOException;
-
-import org.apache.http.conn.ConnectTimeoutException;
-
-import de.fhb.mobile.ToDoListAndroidApp.communication.IServerCommunicationREST;
-import de.fhb.mobile.ToDoListAndroidApp.communication.ServerCommunicationREST;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -24,6 +18,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import de.fhb.mobile.ToDoListAndroidApp.communication.IServerCommunicationREST;
+import de.fhb.mobile.ToDoListAndroidApp.communication.ServerCommunicationREST;
 
 /**
  * The Class LoginActivity.
@@ -58,7 +54,7 @@ public class LoginActivity extends Activity {
 
 	/** The valid password input. */
 	private boolean validPasswordInput = true;
-	
+
 	private IServerCommunicationREST server;
 
 	/**
@@ -75,7 +71,7 @@ public class LoginActivity extends Activity {
 		setContentView(R.layout.login);
 
 		server = new ServerCommunicationREST();
-		
+
 		// init the ui elements
 		errorField = (TextView) findViewById(R.id.errorField);
 		initMailField();
@@ -208,11 +204,14 @@ public class LoginActivity extends Activity {
 					@Override
 					protected void onPostExecute(Object response) {
 						dialog.cancel();
-						Log.i("", "" +response);
-						if((Boolean)response){
-							Toast toast = Toast.makeText(getApplicationContext(), "No connection to Server", Toast.LENGTH_LONG);
+						Log.i("", "" + response);
+						if ((Boolean) response) {
+							Toast toast = Toast.makeText(
+									getApplicationContext(),
+									"No connection to Server",
+									Toast.LENGTH_LONG);
 							toast.show();
-						}else if (correctLogIn == false) {
+						} else if (correctLogIn == false) {
 							errorField
 									.setText("Falsche E-Mail/Falsches Password");
 							validMailInput = false;
