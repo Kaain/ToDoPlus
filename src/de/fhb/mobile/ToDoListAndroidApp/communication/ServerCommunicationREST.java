@@ -86,6 +86,21 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 		String url = SERVER_REST_ADRESS + "synchronize";
 
 		try {
+			// TODO todoliste einfach in die schleife packen dann baut er das json für die auslieferung
+			// JSONArray jsonArray = new JSONArray();
+			// for (Todo t : todolist) {
+			// JSONObject object = new JSONObject();
+			// object.put("id", t.getId());
+			// object.put("description", t.getDescription());
+			// object.put("name", t.getName());
+			// object.put("expire", t.getExpires());
+			// object.put("lastChange", t.getLastChange());
+			// object.put("user", "{}");
+			// object.put("contacts", "[]");
+			// jsonArray.put(object);
+			// }
+			// json.put("list", jsonArray);
+
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 			todoListJson.put("list", todoList);
 			nameValuePairs.add(new BasicNameValuePair("todoListJson",
