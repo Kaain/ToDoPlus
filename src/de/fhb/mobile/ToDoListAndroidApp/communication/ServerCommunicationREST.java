@@ -7,23 +7,31 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
+import android.widget.Toast;
 
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
@@ -35,7 +43,6 @@ import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
  */
 public class ServerCommunicationREST implements IServerCommunicationREST{
 	
-	//private static final String HOST_NAME = "localhost";
 	private static final String HOST_NAME = "10.0.2.2";
 	
 	private static final String PORT = "8080";
@@ -47,24 +54,24 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 	
 	@SuppressWarnings("finally")
 	@Override
-	public boolean authentifactation(String username, String password) {
+	public boolean authentifactation(String username, String password) throws ConnectTimeoutException{
 		String url = SERVER_REST_ADRESS+"authenticate";
 		JSONObject json;
 		boolean isAuthenticate = false;
-		HttpParams params = new BasicHttpParams();
-		params.setParameter("username", username);
-		params.setParameter("password", password);
 		
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+        nameValuePairs.add(new BasicNameValuePair("username", username));
+        nameValuePairs.add(new BasicNameValuePair("password", password));
 		try {
-			json = this.sendRequest(url, "POST",params);
+			json = this.sendRequest(url, "POST",nameValuePairs);
 			isAuthenticate = (Boolean) json.get("isAuthenticate");
+		
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e){
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (IllegalStateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
@@ -86,7 +93,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 		params.setParameter("todoListJson", todoListJson);
 		
 		try {
-			json = this.sendRequest(url, "POST",params);
+			json = this.sendRequest(url, "POST",null);
 			isSynchronize = (Boolean) json.get("isSynchronize");
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -116,7 +123,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 		params.setParameter("todoListJson", todoListJson);
 		
 		try {
-			json = this.sendRequest(url, "POST",params);
+			json = this.sendRequest(url, "POST",null);
 
 			//TODO marschaller
 			
@@ -148,7 +155,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 		params.setParameter("todoJson", todoJson);
 		
 		try {
-			this.sendRequest(url, "POST",params);
+			this.sendRequest(url, "POST",null);
 			
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -171,7 +178,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 		String url = SERVER_REST_ADRESS+"delete/"+todo.getId();
 		
 		try {
-			this.sendRequest(url, "DELETE",params);
+			this.sendRequest(url, "DELETE",null);
 			
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -199,8 +206,10 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 	 * @throws IllegalStateException
 	 * @throws JSONException
 	 */
-	private JSONObject sendRequest(String url,String method,HttpParams params) throws ClientProtocolException, IOException, IllegalStateException, JSONException{
+	private JSONObject sendRequest(String url,String method,List<NameValuePair> params) throws ClientProtocolException, IOException, IllegalStateException, JSONException{
 		HttpClient httpClient = new DefaultHttpClient();
+		httpClient.getParams().setIntParameter("http.connection.timeout", 30000);
+
 		HttpResponse response = httpClient.execute(createHttpRequest(url,method,params));
 		return new JSONObject(responseHandle(response));
 	}
@@ -211,14 +220,16 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 	 * @param url
 	 * @param method
 	 * @return Request Object to execute in a HttpClient
+	 * @throws UnsupportedEncodingException 
 	 */
-	private HttpUriRequest createHttpRequest(String url, String method,HttpParams params) {
+	private HttpUriRequest createHttpRequest(String url, String method,List<NameValuePair> params) throws UnsupportedEncodingException {
 		HttpUriRequest request;
 		if(method.toUpperCase().equals("GET")){
 			request = new HttpGet(url);
 		}else if(method.toUpperCase().equals("POST")){
-			request = new HttpPost(url);
-			request.setParams(params);
+			HttpPost post = new HttpPost(url);
+			post.setEntity(new UrlEncodedFormEntity(params));
+			request = post;
 		}else if(method.toUpperCase().equals("PUT")){
 			request = new HttpPut(url);
 		}else if(method.toUpperCase().equals("DELETE")){
@@ -226,6 +237,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST{
 		}else{
 			request = new HttpGet();
 		}
+
 		return request;
 	}
 

@@ -3,7 +3,10 @@
  */
 package de.fhb.mobile.ToDoListAndroidApp.communication;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.apache.http.conn.ConnectTimeoutException;
 
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
@@ -20,8 +23,9 @@ public interface IServerCommunicationREST {
 	 * @param username
 	 * @param password
 	 * @return true if you are authentifacted.
+	 * @throws IOException 
 	 */
-	public boolean authentifactation(String username,String password);
+	public boolean authentifactation(String username,String password) throws ConnectTimeoutException;
 		
 	/**
 	 * synchronize local todolist with server-todolist

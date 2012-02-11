@@ -1,5 +1,9 @@
 package de.fhb.mobile.ToDoListAndroidApp;
 
+import java.io.IOException;
+
+import org.apache.http.conn.ConnectTimeoutException;
+
 import de.fhb.mobile.ToDoListAndroidApp.communication.IServerCommunicationREST;
 import de.fhb.mobile.ToDoListAndroidApp.communication.ServerCommunicationREST;
 import android.app.Activity;
@@ -19,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 /**
  * The Class LoginActivity.
@@ -173,34 +178,41 @@ public class LoginActivity extends Activity {
 					@Override
 					protected void onPreExecute() {
 						dialog = ProgressDialog.show(LoginActivity.this,
-								"Bitte warten Sie...",
-								"während Ihre Daten überprüft werden.");
+								"Please wait...",
+								"during your data will be load.");
 					}
 
 					// the background process
 					@Override
 					protected Object doInBackground(Void... params) {
+						boolean isAuthenticated = false;
+						boolean exceptionThrown = false;
 						try {
-							Thread.sleep(1500);
-							boolean isAuthenticated = server.authentifactation(mailInputValue, passwordInputValue);
-							/*if (mailInputValue.equals("t@t.t")
-									&& passwordInputValue.equals("123456"))*/
-							if(isAuthenticated){
+							isAuthenticated = server.authentifactation(
+									mailInputValue, passwordInputValue);
+							if (isAuthenticated) {
 								loadTodos();
 								startActivity(new Intent(LoginActivity.this,
 										ToDoListActivity.class));
 								correctLogIn = true;
 							}
-						} catch (InterruptedException e) {
+						} catch (Exception e) {
+							Log.i("", "EXCEPTION THORWN");
+							exceptionThrown = true;
 							e.printStackTrace();
 						}
-						return null;
+						Log.i("", "" + exceptionThrown);
+						return exceptionThrown;
 					}
 
 					@Override
 					protected void onPostExecute(Object response) {
 						dialog.cancel();
-						if (correctLogIn == false) {
+						Log.i("", "" +response);
+						if((Boolean)response){
+							Toast toast = Toast.makeText(getApplicationContext(), "No connection to Server", Toast.LENGTH_LONG);
+							toast.show();
+						}else if (correctLogIn == false) {
 							errorField
 									.setText("Falsche E-Mail/Falsches Password");
 							validMailInput = false;
