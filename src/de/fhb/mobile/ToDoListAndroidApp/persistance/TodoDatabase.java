@@ -41,7 +41,7 @@ public class TodoDatabase {
 	public TodoDatabase(Context context) {
 		this.context = context;
 	}
-	
+
 	public TodoDatabase() {
 	}
 
@@ -56,24 +56,21 @@ public class TodoDatabase {
 		oh = null;
 		SQLiteDatabase.releaseMemory();
 	}
-	
-	public List<Todo> synchronize(List<Todo> todoList) throws UpdateException, CreateException{
 
-			for (Todo t : todoList) {
-				Todo databaseTodo = this.getTodoById(t.getId());
-				System.out.println("mal sehen");
-				if (databaseTodo.getId() == 0) {
-					this.createTodo(t);
-				} else {
-					if (databaseTodo.getLastUpdated() <= t
-							.getLastUpdated()) {
-						this.updateTodo(t);
-					} else {
-						t = databaseTodo;
-					}
-				}
-			}
-			return todoList;
+	/**
+	 * synchronize database with given list.
+	 * 
+	 * @param todoList
+	 * @return
+	 * @throws UpdateException
+	 * @throws CreateException
+	 */
+	public List<Todo> synchronize(List<Todo> todoList) throws UpdateException,
+			CreateException {
+		for (Todo t : todoList) {
+			this.updateTodo(t);
+		}
+		return todoList;
 	}
 
 	/**
@@ -367,14 +364,11 @@ public class TodoDatabase {
 			returnTodo.setContacts(getAllContacts(id));
 			cursor.close();
 			return returnTodo;
-		}else{
+		} else {
 			cursor.close();
 			return null;
 		}
-			
-		
 
-		
 	}
 
 	/**
@@ -475,42 +469,49 @@ public class TodoDatabase {
 		deleteAllTodoToContact(todoId);
 		createTodoToContact(todoId, contactsId);
 	}
-	
+
 	/**
-	 * Authenticate user.
-	 * if there is no user in database, he will be created
-	 *
-	 * @param user the user
+	 * Authenticate user. if there is no user in database, he will be created
+	 * 
+	 * @param user
+	 *            the user
 	 * @return true, if successful
 	 */
-	public boolean authenticateUser(User user) throws OneConnectToServerException{
-		Cursor cursor = database.query(UserTable.TABLE_USER, null, null, null, null, null, null);
-		if(cursor.moveToNext() && cursor.isFirst()){
+	public boolean authenticateUser(User user)
+			throws OneConnectToServerException {
+		Cursor cursor = database.query(UserTable.TABLE_USER, null, null, null,
+				null, null, null);
+		if (cursor.moveToNext() && cursor.isFirst()) {
 			int iUsername = cursor.getColumnIndex(UserTable.KEY_USERNAME);
 			int iPassword = cursor.getColumnIndex(UserTable.KEY_PASSWORD);
-			int iOneConnectToServer = cursor.getColumnIndex(UserTable.KEY_ONECONNECTWITHSERVER);
+			int iOneConnectToServer = cursor
+					.getColumnIndex(UserTable.KEY_ONECONNECTWITHSERVER);
 			String username = cursor.getString(iUsername);
 			String password = cursor.getString(iPassword);
-			boolean oneConnectToServer = (cursor.getInt(iOneConnectToServer) == 1) ? true : false;
-			
-			if(!oneConnectToServer && !user.isOneConnectWithServer())
-				throw new OneConnectToServerException("Need one connect to server!");
+			boolean oneConnectToServer = (cursor.getInt(iOneConnectToServer) == 1) ? true
+					: false;
+
+			if (!oneConnectToServer && !user.isOneConnectWithServer())
+				throw new OneConnectToServerException(
+						"Need one connect to server!");
 			else
 				updateUser(true);
-			
-			if(user.getPassword().compareTo(password) == 0 && user.getUsername().compareTo(username) == 0)
+
+			if (user.getPassword().compareTo(password) == 0
+					&& user.getUsername().compareTo(username) == 0)
 				return true;
 			else
 				return false;
-		}else{
+		} else {
 			return false;
 		}
-		
+
 	}
-	
-	public void createUser(User user){
-		Cursor cursor = database.query(UserTable.TABLE_USER, null, null, null, null, null, null);
-		if(!cursor.moveToNext()){
+
+	public void createUser(User user) {
+		Cursor cursor = database.query(UserTable.TABLE_USER, null, null, null,
+				null, null, null);
+		if (!cursor.moveToNext()) {
 			ContentValues values = new ContentValues();
 			values.put(UserTable.KEY_USERNAME, user.getUsername());
 			values.put(UserTable.KEY_PASSWORD, user.getPassword());
@@ -518,8 +519,8 @@ public class TodoDatabase {
 			database.insert(UserTable.TABLE_USER, null, values);
 		}
 	}
-	
-	private void updateUser(boolean isOneConnectWithServer){
+
+	private void updateUser(boolean isOneConnectWithServer) {
 		ContentValues values = new ContentValues();
 		values.put(UserTable.KEY_ONECONNECTWITHSERVER, isOneConnectWithServer);
 		database.update(UserTable.TABLE_USER, values, null, null);

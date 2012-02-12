@@ -97,14 +97,12 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 		JSONObject todoListJson = new JSONObject();
 		JSONObject json;
 		String url = SERVER_REST_ADRESS + "synchronize";
-		
+
 		TodoDatabase db = new TodoDatabase(context);
 		db.open();
-		
+
 		List<Todo> todoList = db.getAllTodos(null);
 		try {
-			// TODO todoliste einfach in die schleife packen dann baut er das
-			// json für die auslieferung
 			JSONArray jsonArray = new JSONArray();
 			for (Todo t : todoList) {
 				jsonArray.put(TodoMarshaller.marshall(t));
@@ -112,19 +110,16 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 			todoListJson.put("list", jsonArray);
 
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-			// todoListJson.put("list", todoList);
 			nameValuePairs.add(new BasicNameValuePair("todoListJson",
 					todoListJson.toString()));
-			Log.i("#", todoListJson.toString());
 			json = this.sendRequest(url, "POST", nameValuePairs);
-			Log.i("#", json.toString());
-			todoList = TodoUnmarshaller.unmarshallList(json.getJSONArray("list"));
-			Log.i("_", todoList.toString() +":" +todoList.get(0).getId() +" # " +todoList.get(1).getId());
-			//TODO sync list in die database speichern
+			todoList = TodoUnmarshaller.unmarshallList(json
+					.getJSONArray("list"));
+
 			todoList = db.synchronize(todoList);
-			
+
 			isSynchronize = (Boolean) json.get("isSynchronize");
-			Log.i("isSynch", "" +isSynchronize);
+			Log.i("isSynch", "" + isSynchronize);
 		} catch (ClientProtocolException e) {
 			Log.e("exception", e.getMessage());
 		} catch (IllegalStateException e) {
@@ -283,9 +278,8 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 	private static String responseHandle(HttpResponse response)
 			throws IllegalStateException, IOException {
 		HttpEntity entity = response.getEntity();
-		Log.i("###",(entity!=null)? entity.toString():"null");
 		if (entity != null) {
-			
+
 			InputStream inputStream = entity.getContent();
 			return ServerCommunicationREST.convertStreamToString(inputStream);
 		} else
@@ -310,7 +304,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 				sb.append(line + "\n");
 			}
 		} catch (IOException e) {
-			Log.e("EXCEPTION",e.getMessage());
+			Log.e("EXCEPTION", e.getMessage());
 		} finally {
 			try {
 				inputStream.close();
