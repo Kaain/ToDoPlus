@@ -33,6 +33,8 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
+import de.fhb.mobile.ToDoListAndroidApp.communication.marshalling.ContactMarshaller;
+import de.fhb.mobile.ToDoListAndroidApp.communication.marshalling.TodoMarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.communication.unmarshalling.TodoUnmarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
@@ -106,17 +108,18 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 			// json für die auslieferung
 			JSONArray jsonArray = new JSONArray();
 			for (Todo t : todoList) {
-				JSONObject object = new JSONObject();
-				object.put("id", t.getId());
-				object.put("description", t.getDescription());
-				object.put("name", t.getName());
-				object.put("expire", t.getExpireDate().getTime().getTime());
-				object.put("lastChange", t.getLastUpdated());
-				object.put("favourite", t.isFavorite());
-				object.put("finished", t.isFinished());
-				// object.put("user", "{}");
-				object.put("contacts", t.getContacts());
-				jsonArray.put(object);
+				jsonArray.put(TodoMarshaller.marshall(t));
+//				JSONObject object = new JSONObject();
+//				object.put("id", t.getId());
+//				object.put("description", t.getDescription());
+//				object.put("name", t.getName());
+//				object.put("expire", t.getExpireDate().getTime().getTime());
+//				object.put("lastChange", t.getLastUpdated());
+//				object.put("favourite", t.isFavorite());
+//				object.put("finished", t.isFinished());
+//				// object.put("user", "{}");
+//				object.put("contacts", ContactMarshaller.marshallList(t.getContacts()));
+//				jsonArray.put(object);
 			}
 			todoListJson.put("list", jsonArray);
 
