@@ -41,6 +41,9 @@ public class TodoDatabase {
 	public TodoDatabase(Context context) {
 		this.context = context;
 	}
+	
+	public TodoDatabase() {
+	}
 
 	/**
 	 * Closes the database.
@@ -52,6 +55,25 @@ public class TodoDatabase {
 		database = null;
 		oh = null;
 		SQLiteDatabase.releaseMemory();
+	}
+	
+	public List<Todo> synchronize(List<Todo> todoList) throws UpdateException, CreateException{
+
+			for (Todo t : todoList) {
+				Todo databaseTodo = this.getTodoById(t.getId());
+				System.out.println("mal sehen");
+				if (databaseTodo.getId() == 0) {
+					this.createTodo(t);
+				} else {
+					if (databaseTodo.getLastUpdated() <= t
+							.getLastUpdated()) {
+						this.updateTodo(t);
+					} else {
+						t = databaseTodo;
+					}
+				}
+			}
+			return todoList;
 	}
 
 	/**
@@ -320,31 +342,39 @@ public class TodoDatabase {
 		Cursor cursor = database.query(TodoTable.TABLE_TODO, null,
 				TodoTable.KEY_ID + "=?", new String[] { String.valueOf(id) },
 				null, null, null);
-		cursor.moveToFirst();
-		idIndex = cursor.getColumnIndex(TodoTable.KEY_ID);
-		todoNameIndex = cursor.getColumnIndex(TodoTable.KEY_NAME);
-		descriptionIndex = cursor.getColumnIndex(TodoTable.KEY_DESCRIPTION);
-		finishedIndex = cursor.getColumnIndex(TodoTable.KEY_FINISHED);
-		favoriteIndex = cursor.getColumnIndex(TodoTable.KEY_FAVORITE);
-		expiredateIndex = cursor.getColumnIndex(TodoTable.KEY_EXPIREDATE);
+		if (cursor.moveToFirst()) {
+			idIndex = cursor.getColumnIndex(TodoTable.KEY_ID);
+			todoNameIndex = cursor.getColumnIndex(TodoTable.KEY_NAME);
+			descriptionIndex = cursor.getColumnIndex(TodoTable.KEY_DESCRIPTION);
+			finishedIndex = cursor.getColumnIndex(TodoTable.KEY_FINISHED);
+			favoriteIndex = cursor.getColumnIndex(TodoTable.KEY_FAVORITE);
+			expiredateIndex = cursor.getColumnIndex(TodoTable.KEY_EXPIREDATE);
 
-		Todo returnTodo = new Todo();
-		returnTodo.setId(cursor.getLong(idIndex));
-		returnTodo.setName(cursor.getString(todoNameIndex));
-		returnTodo.setDescription(cursor.getString(descriptionIndex));
-		returnTodo
-				.setFavorite((cursor.getInt(favoriteIndex) > 0 ? true : false));
-		returnTodo
-				.setFinished((cursor.getInt(finishedIndex) > 0 ? true : false));
-		long expiredate = cursor.getLong(expiredateIndex);
-		if (expiredate == 0)
-			returnTodo.setExpireDate(null);
-		else
-			returnTodo.setExpireDate(DateHelper.getCalendarByLong(expiredate));
-		returnTodo.setContacts(getAllContacts(id));
-		cursor.close();
+			Todo returnTodo = new Todo();
+			returnTodo.setId(cursor.getLong(idIndex));
+			returnTodo.setName(cursor.getString(todoNameIndex));
+			returnTodo.setDescription(cursor.getString(descriptionIndex));
+			returnTodo.setFavorite((cursor.getInt(favoriteIndex) > 0 ? true
+					: false));
+			returnTodo.setFinished((cursor.getInt(finishedIndex) > 0 ? true
+					: false));
+			long expiredate = cursor.getLong(expiredateIndex);
+			if (expiredate == 0)
+				returnTodo.setExpireDate(null);
+			else
+				returnTodo.setExpireDate(DateHelper
+						.getCalendarByLong(expiredate));
+			returnTodo.setContacts(getAllContacts(id));
+			cursor.close();
+			return returnTodo;
+		}else{
+			cursor.close();
+			return null;
+		}
+			
+		
 
-		return returnTodo;
+		
 	}
 
 	/**

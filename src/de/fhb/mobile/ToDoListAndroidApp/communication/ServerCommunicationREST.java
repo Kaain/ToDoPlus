@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import android.util.Log;
 import de.fhb.mobile.ToDoListAndroidApp.communication.unmarshalling.TodoUnmarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 
 /**
  * This class implements the REST commincation.
@@ -89,12 +90,16 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 
 	@SuppressWarnings("finally")
 	@Override
-	public boolean synchronize(List<Todo> todoList) {
+	public boolean synchronize() {
 		boolean isSynchronize = false;
 		JSONObject todoListJson = new JSONObject();
 		JSONObject json;
 		String url = SERVER_REST_ADRESS + "synchronize";
-
+		
+		TodoDatabase db = new TodoDatabase();
+		db.open();
+		
+		List<Todo> todoList = db.getAllTodos(null);
 		try {
 			// TODO todoliste einfach in die schleife packen dann baut er das
 			// json für die auslieferung
@@ -124,6 +129,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 			todoList = TodoUnmarshaller.unmarshallList(json.getJSONArray("list"));
 			
 			//TODO sync list in die database speichern
+			todoList = db.synchronize(todoList);
 			
 			isSynchronize = (Boolean) json.get("isSynchronize");
 		} catch (ClientProtocolException e) {
@@ -135,6 +141,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 		} catch (JSONException e) {
 			Log.e("exception", e.getMessage());
 		} finally {
+			db.close();
 			return isSynchronize;
 		}
 	}

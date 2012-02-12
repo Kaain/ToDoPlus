@@ -33,7 +33,7 @@ public interface IServerCommunicationREST {
 	 * @param todoList
 	 * @return 
 	 */
-	public boolean synchronize(List<Todo> todoList);
+	public boolean synchronize();
 	
 	/**
 	 * get all todos from Server.
