@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
+import de.fhb.mobile.ToDoListAndroidApp.communication.unmarshalling.TodoUnmarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
 /**
@@ -119,6 +120,11 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 					todoListJson.toString()));
 			Log.i("#", todoListJson.toString());
 			json = this.sendRequest(url, "POST", nameValuePairs);
+			
+			todoList = TodoUnmarshaller.unmarshallList(json.getJSONArray("list"));
+			
+			//TODO sync list in die database speichern
+			
 			isSynchronize = (Boolean) json.get("isSynchronize");
 		} catch (ClientProtocolException e) {
 			Log.e("exception", e.getMessage());
