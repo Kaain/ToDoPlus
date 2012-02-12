@@ -13,8 +13,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import de.fhb.mobile.ToDoListAndroidApp.commons.DateHelper;
 import de.fhb.mobile.ToDoListAndroidApp.exceptions.CreateException;
+import de.fhb.mobile.ToDoListAndroidApp.exceptions.OneConnectToServerException;
 import de.fhb.mobile.ToDoListAndroidApp.exceptions.UpdateException;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
+import de.fhb.mobile.ToDoListAndroidApp.models.User;
 
 /**
  * The Class TodoDatabase.
@@ -442,5 +444,54 @@ public class TodoDatabase {
 
 		deleteAllTodoToContact(todoId);
 		createTodoToContact(todoId, contactsId);
+	}
+	
+	/**
+	 * Authenticate user.
+	 * if there is no user in database, he will be created
+	 *
+	 * @param user the user
+	 * @return true, if successful
+	 */
+	public boolean authenticateUser(User user) throws OneConnectToServerException{
+		Cursor cursor = database.query(UserTable.TABLE_USER, null, null, null, null, null, null);
+		if(cursor.moveToNext() && cursor.isFirst()){
+			int iUsername = cursor.getColumnIndex(UserTable.KEY_USERNAME);
+			int iPassword = cursor.getColumnIndex(UserTable.KEY_PASSWORD);
+			int iOneConnectToServer = cursor.getColumnIndex(UserTable.KEY_ONECONNECTWITHSERVER);
+			String username = cursor.getString(iUsername);
+			String password = cursor.getString(iPassword);
+			boolean oneConnectToServer = (cursor.getInt(iOneConnectToServer) == 1) ? true : false;
+			
+			if(!oneConnectToServer && !user.isOneConnectWithServer())
+				throw new OneConnectToServerException("Need one connect to server!");
+			else
+				updateUser(true);
+			
+			if(user.getPassword().compareTo(password) == 0 && user.getUsername().compareTo(username) == 0)
+				return true;
+			else
+				return false;
+		}else{
+			return false;
+		}
+		
+	}
+	
+	public void createUser(User user){
+		Cursor cursor = database.query(UserTable.TABLE_USER, null, null, null, null, null, null);
+		if(!cursor.moveToNext()){
+			ContentValues values = new ContentValues();
+			values.put(UserTable.KEY_USERNAME, user.getUsername());
+			values.put(UserTable.KEY_PASSWORD, user.getPassword());
+			values.put(UserTable.KEY_ONECONNECTWITHSERVER, false);
+			database.insert(UserTable.TABLE_USER, null, values);
+		}
+	}
+	
+	private void updateUser(boolean isOneConnectWithServer){
+		ContentValues values = new ContentValues();
+		values.put(UserTable.KEY_ONECONNECTWITHSERVER, isOneConnectWithServer);
+		database.update(UserTable.TABLE_USER, values, null, null);
 	}
 }

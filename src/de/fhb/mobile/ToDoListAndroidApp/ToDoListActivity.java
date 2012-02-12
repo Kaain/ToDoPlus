@@ -28,6 +28,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
+import de.fhb.mobile.ToDoListAndroidApp.communication.IServerCommunicationREST;
+import de.fhb.mobile.ToDoListAndroidApp.communication.ServerCommunicationREST;
 import de.fhb.mobile.ToDoListAndroidApp.exceptions.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
@@ -62,6 +64,8 @@ public class ToDoListActivity extends ListActivity {
 
 	/** The db. */
 	private TodoDatabase db;
+	
+	private IServerCommunicationREST server;
 
 	/** The sorting. */
 	private int sorting;
@@ -90,13 +94,20 @@ public class ToDoListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.todolist);
 		Log.i(this.getClass().toString(), "onCreate");
+		
+		boolean serverConnection = getIntent().getBooleanExtra(LoginActivity.ARG_SERVER_CONNECTION, true);
+		
 		mode = MODE_ALLTODOS;
 		headline = (TextView) findViewById(R.id.alltodos_activityname);
 		initSortSpinner();
 		db = new TodoDatabase(this);
 		db.open();
-
-		// initTodos();
+		
+		if(serverConnection){
+			List<Todo> todoList = db.getAllTodos(null);
+			server = new ServerCommunicationREST();
+			server.synchronize(todoList);
+		}
 	}
 
 	/*

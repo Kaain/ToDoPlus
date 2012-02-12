@@ -20,12 +20,18 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import de.fhb.mobile.ToDoListAndroidApp.communication.IServerCommunicationREST;
 import de.fhb.mobile.ToDoListAndroidApp.communication.ServerCommunicationREST;
+import de.fhb.mobile.ToDoListAndroidApp.exceptions.OneConnectToServerException;
+import de.fhb.mobile.ToDoListAndroidApp.models.User;
+import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
 
 /**
  * The Class LoginActivity.
  */
 public class LoginActivity extends Activity {
+	
+	public static final String ARG_SERVER_CONNECTION = "serverConnection";
 
+	private TodoDatabase db;
 	// the ui elements
 	/** The mail field. */
 	private EditText mailField;
@@ -39,12 +45,6 @@ public class LoginActivity extends Activity {
 	/** The error field. */
 	private TextView errorField;
 
-	/** The mail input value. */
-	private String mailInputValue = null;
-
-	/** The password input value. */
-	private String passwordInputValue = null;
-
 	/** The correct log in. */
 	private boolean correctLogIn = false;
 
@@ -56,6 +56,8 @@ public class LoginActivity extends Activity {
 	private boolean validPasswordInput = true;
 
 	private IServerCommunicationREST server;
+	
+	private User actualUser;
 
 	/**
 	 * Called when the activity is first created.
@@ -70,6 +72,11 @@ public class LoginActivity extends Activity {
 		// set the list view as content view
 		setContentView(R.layout.login);
 
+		db = new TodoDatabase(this);
+		db.open();
+		
+		actualUser = new User();
+		
 		server = new ServerCommunicationREST();
 
 		// init the ui elements
@@ -77,6 +84,52 @@ public class LoginActivity extends Activity {
 		initMailField();
 		initPasswordField();
 		initLoginButton();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onPause()
+	 */
+	@Override
+	public void onPause() {
+		Log.i(this.getClass().toString(), "onPause");
+		super.onPause();
+		db.close();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onStop()
+	 */
+	@Override
+	public void onStop() {
+		Log.i(this.getClass().toString(), "onStop");
+		super.onStop();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	public void onResume() {
+		Log.i(this.getClass().toString(), "onResume");
+		super.onResume();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onRestart()
+	 */
+	@Override
+	public void onRestart() {
+		Log.i(this.getClass().toString(), "onRestart");
+		super.onRestart();
+		db.open();
 	}
 
 	/**
@@ -175,61 +228,78 @@ public class LoginActivity extends Activity {
 					protected void onPreExecute() {
 						dialog = ProgressDialog.show(LoginActivity.this,
 								"Please wait...",
-								"during your data will be load.");
+								"while logging in ...");
 					}
 
 					// the background process
 					@Override
 					protected Object doInBackground(Void... params) {
-						boolean isAuthenticated = false;
-						boolean exceptionThrown = false;
-						try {
-							isAuthenticated = server.authentifactation(
-									mailInputValue, passwordInputValue);
-							if (isAuthenticated) {
-								loadTodos();
-								startActivity(new Intent(LoginActivity.this,
-										ToDoListActivity.class));
-								correctLogIn = true;
-							}
-						} catch (Exception e) {
-							Log.i("", "EXCEPTION THORWN");
-							exceptionThrown = true;
-							e.printStackTrace();
-						}
-						Log.i("", "" + exceptionThrown);
-						return exceptionThrown;
+						int isAuthenticated = server.authentification(
+									actualUser.getUsername(), actualUser.getPassword());
+						return isAuthenticated;
 					}
 
 					@Override
 					protected void onPostExecute(Object response) {
 						dialog.cancel();
-						Log.i("", "" + response);
-						if ((Boolean) response) {
-							Toast toast = Toast.makeText(
+						int isAuthenticated = (Integer) response;
+						Intent intent = new Intent(LoginActivity.this,
+								ToDoListActivity.class);
+						db.createUser(actualUser);
+						switch (isAuthenticated) {
+						case 1:
+							actualUser.setOneConnectWithServer(true);
+							break;
+						case -1:
+							intent.putExtra(ARG_SERVER_CONNECTION, false);
+							Toast toastTimeout = Toast.makeText(
 									getApplicationContext(),
-									"No connection to Server",
+									"No connection to Server, login with local database",
 									Toast.LENGTH_LONG);
-							toast.show();
-						} else if (correctLogIn == false) {
-							errorField
-									.setText("Falsche E-Mail/Falsches Password");
-							validMailInput = false;
-							validPasswordInput = false;
-							loginButton.setEnabled(false);
+							toastTimeout.show();
+							break;
+						case -2:
+							intent.putExtra(ARG_SERVER_CONNECTION, false);
+							Toast toastIO = Toast.makeText(
+									getApplicationContext(),
+									"Problem with connection to Server, login with local database",
+									Toast.LENGTH_LONG);
+							toastIO.show();
+							break;
 						}
+						try {
+							boolean isAuthDB;
+							if (isAuthenticated != 0) {
+
+								isAuthDB = db.authenticateUser(actualUser);
+
+							} else {
+								isAuthDB = false;
+							}
+
+							if (isAuthDB) {
+								startActivity(intent);
+							} else {
+								errorField
+										.setText("Falsche E-Mail/Falsches Password");
+								validMailInput = false;
+								validPasswordInput = false;
+								loginButton.setEnabled(false);
+							}
+
+						} catch (OneConnectToServerException e) {
+							Toast toastIO = Toast.makeText(
+									getApplicationContext(), e.getMessage(),
+									Toast.LENGTH_LONG);
+							toastIO.show();
+							e.printStackTrace();
+						}
+
 					}
 
 				}.execute();
 			}
 		});
-	}
-
-	/**
-	 * Load todos.
-	 */
-	private void loadTodos() {
-		// TODO
 	}
 
 	/**
@@ -246,7 +316,7 @@ public class LoginActivity extends Activity {
 			validMailInput = false;
 		} else {
 			validMailInput = true;
-			mailInputValue = text;
+			actualUser.setUsername(text);
 		}
 	}
 
@@ -254,8 +324,8 @@ public class LoginActivity extends Activity {
 	 * Process mail input changed.
 	 */
 	private void processMailInputChanged() {
-		if (mailInputValue != null) {
-			mailInputValue = null;
+		if (actualUser.getUsername() != null) {
+			actualUser.setUsername(null);
 		}
 
 		if (!validMailInput) {
@@ -279,7 +349,7 @@ public class LoginActivity extends Activity {
 			validPasswordInput = false;
 		} else {
 			validPasswordInput = true;
-			passwordInputValue = text;
+			actualUser.setPassword(text);
 		}
 		updateLoginButtonState();
 	}
@@ -288,8 +358,8 @@ public class LoginActivity extends Activity {
 	 * Process password input changed.
 	 */
 	private void processPasswordInputChanged() {
-		if (passwordInputValue != null) {
-			passwordInputValue = null;
+		if (actualUser.getPassword() != null) {
+			actualUser.setPassword(null);
 		}
 
 		if (!validPasswordInput) {
@@ -304,6 +374,6 @@ public class LoginActivity extends Activity {
 	 */
 	private void updateLoginButtonState() {
 		loginButton.setEnabled(validMailInput && validPasswordInput
-				&& mailInputValue != null && passwordInputValue != null);
+				&& actualUser.getUsername() != null && actualUser.getPassword() != null);
 	}
 }

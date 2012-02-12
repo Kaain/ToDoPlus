@@ -36,6 +36,7 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase database) {
 		TodoTable.onCreate(database);
 		TodoToContactTable.onCreate(database);
+		UserTable.onCreate(database);
 		TodoViews.createViewTodoAndContact(database);
 	}
 
@@ -51,5 +52,6 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
 			int newVersion) {
 		TodoTable.onUpgrade(database, oldVersion, newVersion);
 		TodoToContactTable.onUpgrade(database, oldVersion, newVersion);
+		UserTable.onCreate(database);
 	}
 }

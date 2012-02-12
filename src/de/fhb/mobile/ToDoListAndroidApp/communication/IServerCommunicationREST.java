@@ -18,14 +18,14 @@ import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 public interface IServerCommunicationREST {
 	
 	/**
-	 * authentificate the user on the server.
+	 * authenticate the user on the server.
 	 * 
 	 * @param username
 	 * @param password
-	 * @return true if you are authentifacted.
+	 * @return "1" if you are authenticated, 0 if you aren´t, -1 if ConnectTimeOutException, -2 if IOException.
 	 * @throws IOException 
 	 */
-	public boolean authentifactation(String username,String password) throws ConnectTimeoutException;
+	public int authentification(String username,String password);
 		
 	/**
 	 * synchronize local todolist with server-todolist

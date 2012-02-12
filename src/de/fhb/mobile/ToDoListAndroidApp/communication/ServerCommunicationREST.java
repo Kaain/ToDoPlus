@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
@@ -51,20 +52,27 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 
 	@SuppressWarnings("finally")
 	@Override
-	public boolean authentifactation(String username, String password) {
+	public int authentification(String username, String password) {
 		String url = SERVER_REST_ADRESS + "authenticate";
 		JSONObject json;
-		boolean isAuthenticate = false;
+		int isAuthenticate = 0;
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 		nameValuePairs.add(new BasicNameValuePair("username", username));
 		nameValuePairs.add(new BasicNameValuePair("password", password));
 		try {
 			json = this.sendRequest(url, "POST", nameValuePairs);
-			isAuthenticate = (Boolean) json.get("isAuthenticate");
+			if((Boolean) json.get("isAuthenticate"))
+				isAuthenticate = 1;
+			else
+				isAuthenticate = 0;
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			if (e instanceof ConnectTimeoutException)
+				isAuthenticate = -1;
+			else
+				isAuthenticate = -2;
 			e.printStackTrace();
 		} catch (IllegalStateException e) {
 			// TODO Auto-generated catch block
