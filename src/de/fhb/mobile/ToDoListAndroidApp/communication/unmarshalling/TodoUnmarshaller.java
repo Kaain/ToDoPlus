@@ -29,6 +29,7 @@ public class TodoUnmarshaller {
 		todo.setDescription(todoJson.getString("description"));
 		todo.setFavorite(todoJson.getBoolean("favourite"));
 		todo.setFinished(todoJson.getBoolean("finished"));
+		todo.setId(todoJson.getLong("id"));
 		todo.setExpireDate(expire);
 		todo.setLastUpdated(todoJson.getLong("lastChange"));
 		todo.setName(todoJson.getString("name"));

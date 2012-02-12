@@ -119,11 +119,12 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 			json = this.sendRequest(url, "POST", nameValuePairs);
 			Log.i("#", json.toString());
 			todoList = TodoUnmarshaller.unmarshallList(json.getJSONArray("list"));
-			Log.i("_", todoList.toString());
+			Log.i("_", todoList.toString() +":" +todoList.get(0).getId() +" # " +todoList.get(1).getId());
 			//TODO sync list in die database speichern
 			todoList = db.synchronize(todoList);
 			
 			isSynchronize = (Boolean) json.get("isSynchronize");
+			Log.i("isSynch", "" +isSynchronize);
 		} catch (ClientProtocolException e) {
 			Log.e("exception", e.getMessage());
 		} catch (IllegalStateException e) {
