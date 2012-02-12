@@ -2,7 +2,6 @@ package de.fhb.mobile.ToDoListAndroidApp;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
@@ -30,7 +29,6 @@ import android.widget.TextView;
 import de.fhb.mobile.ToDoListAndroidApp.commons.AndroidContactsHelper;
 import de.fhb.mobile.ToDoListAndroidApp.communication.IServerCommunicationREST;
 import de.fhb.mobile.ToDoListAndroidApp.communication.ServerCommunicationREST;
-import de.fhb.mobile.ToDoListAndroidApp.exceptions.CreateException;
 import de.fhb.mobile.ToDoListAndroidApp.models.Contact;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 import de.fhb.mobile.ToDoListAndroidApp.persistance.TodoDatabase;
@@ -107,7 +105,9 @@ public class ToDoListActivity extends ListActivity {
 			Log.i(this.getClass().toString(), "Synchronize");
 			List<Todo> todoList = db.getAllTodos(null);
 			server = new ServerCommunicationREST();
+			// TODO sync meldung an user ausgeben
 			server.synchronize(todoList);
+			
 		}
 	}
 

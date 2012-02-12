@@ -62,7 +62,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 		nameValuePairs.add(new BasicNameValuePair("password", password));
 		try {
 			json = this.sendRequest(url, "POST", nameValuePairs);
-			if((Boolean) json.get("isAuthenticate"))
+			if ((Boolean) json.get("isAuthenticate"))
 				isAuthenticate = 1;
 			else
 				isAuthenticate = 0;
@@ -95,42 +95,39 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 		String url = SERVER_REST_ADRESS + "synchronize";
 
 		try {
-//			 TODO todoliste einfach in die schleife packen dann baut er das json für die auslieferung
-			 JSONArray jsonArray = new JSONArray();
-			 for (Todo t : todoList) {
-			 JSONObject object = new JSONObject();
-			 object.put("id", t.getId());
-			 object.put("description", t.getDescription());
-			 object.put("name", t.getName());
-			 object.put("expire", t.getExpireDate().getTime().getTime());
-			 object.put("lastChange", t.getLastUpdated());
-			 object.put("favourite", t.isFavorite());
-			 object.put("finished", t.isFinished());
-			 //object.put("user", "{}");
-			 object.put("contacts", t.getContacts());
-			 jsonArray.put(object);
-			 }
-			 todoListJson.put("list", jsonArray);
+			// TODO todoliste einfach in die schleife packen dann baut er das
+			// json für die auslieferung
+			JSONArray jsonArray = new JSONArray();
+			for (Todo t : todoList) {
+				JSONObject object = new JSONObject();
+				object.put("id", t.getId());
+				object.put("description", t.getDescription());
+				object.put("name", t.getName());
+				object.put("expire", t.getExpireDate().getTime().getTime());
+				object.put("lastChange", t.getLastUpdated());
+				object.put("favourite", t.isFavorite());
+				object.put("finished", t.isFinished());
+				// object.put("user", "{}");
+				object.put("contacts", t.getContacts());
+				jsonArray.put(object);
+			}
+			todoListJson.put("list", jsonArray);
 
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-			//todoListJson.put("list", todoList);
+			// todoListJson.put("list", todoList);
 			nameValuePairs.add(new BasicNameValuePair("todoListJson",
 					todoListJson.toString()));
 			Log.i("#", todoListJson.toString());
 			json = this.sendRequest(url, "POST", nameValuePairs);
 			isSynchronize = (Boolean) json.get("isSynchronize");
 		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("exception", e.getMessage());
 		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("exception", e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("exception", e.getMessage());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("exception", e.getMessage());
 		} finally {
 			return isSynchronize;
 		}
