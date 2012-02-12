@@ -33,7 +33,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
-import de.fhb.mobile.ToDoListAndroidApp.communication.marshalling.ContactMarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.communication.marshalling.TodoMarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.communication.unmarshalling.TodoUnmarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
@@ -109,17 +108,6 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 			JSONArray jsonArray = new JSONArray();
 			for (Todo t : todoList) {
 				jsonArray.put(TodoMarshaller.marshall(t));
-//				JSONObject object = new JSONObject();
-//				object.put("id", t.getId());
-//				object.put("description", t.getDescription());
-//				object.put("name", t.getName());
-//				object.put("expire", t.getExpireDate().getTime().getTime());
-//				object.put("lastChange", t.getLastUpdated());
-//				object.put("favourite", t.isFavorite());
-//				object.put("finished", t.isFinished());
-//				// object.put("user", "{}");
-//				object.put("contacts", ContactMarshaller.marshallList(t.getContacts()));
-//				jsonArray.put(object);
 			}
 			todoListJson.put("list", jsonArray);
 
@@ -129,9 +117,9 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 					todoListJson.toString()));
 			Log.i("#", todoListJson.toString());
 			json = this.sendRequest(url, "POST", nameValuePairs);
-			
+			Log.i("#", json.toString());
 			todoList = TodoUnmarshaller.unmarshallList(json.getJSONArray("list"));
-			
+			Log.i("_", todoList.toString());
 			//TODO sync list in die database speichern
 			todoList = db.synchronize(todoList);
 			
@@ -294,7 +282,9 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 	private static String responseHandle(HttpResponse response)
 			throws IllegalStateException, IOException {
 		HttpEntity entity = response.getEntity();
+		Log.i("###",(entity!=null)? entity.toString():"null");
 		if (entity != null) {
+			
 			InputStream inputStream = entity.getContent();
 			return ServerCommunicationREST.convertStreamToString(inputStream);
 		} else
@@ -319,7 +309,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 				sb.append(line + "\n");
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e("EXCEPTION",e.getMessage());
 		} finally {
 			try {
 				inputStream.close();
@@ -327,6 +317,7 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 				e.printStackTrace();
 			}
 		}
+		Log.i("##sb#", sb.toString());
 		return sb.toString();
 	}
 }

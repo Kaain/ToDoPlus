@@ -3,11 +3,8 @@
  */
 package de.fhb.mobile.ToDoListAndroidApp.communication.unmarshalling;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -29,7 +26,6 @@ public class TodoUnmarshaller {
 
 		GregorianCalendar expire = new GregorianCalendar();
 		expire.setTimeInMillis(todoJson.getLong("expire"));
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		todo.setDescription(todoJson.getString("description"));
 		todo.setFavorite(todoJson.getBoolean("favourite"));
 		todo.setFinished(todoJson.getBoolean("finished"));
