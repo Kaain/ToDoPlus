@@ -31,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.util.Log;
 import de.fhb.mobile.ToDoListAndroidApp.communication.unmarshalling.TodoUnmarshaller;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
@@ -90,13 +91,13 @@ public class ServerCommunicationREST implements IServerCommunicationREST {
 
 	@SuppressWarnings("finally")
 	@Override
-	public boolean synchronize() {
+	public boolean synchronize(Context context) {
 		boolean isSynchronize = false;
 		JSONObject todoListJson = new JSONObject();
 		JSONObject json;
 		String url = SERVER_REST_ADRESS + "synchronize";
 		
-		TodoDatabase db = new TodoDatabase();
+		TodoDatabase db = new TodoDatabase(context);
 		db.open();
 		
 		List<Todo> todoList = db.getAllTodos(null);

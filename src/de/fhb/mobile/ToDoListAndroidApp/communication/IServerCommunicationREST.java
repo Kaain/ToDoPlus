@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.apache.http.conn.ConnectTimeoutException;
 
+import android.content.Context;
+
+import de.fhb.mobile.ToDoListAndroidApp.ToDoListActivity;
 import de.fhb.mobile.ToDoListAndroidApp.models.Todo;
 
 
@@ -29,11 +32,12 @@ public interface IServerCommunicationREST {
 		
 	/**
 	 * synchronize local todolist with server-todolist
+	 * @param toDoListActivity 
 	 * 
 	 * @param todoList
 	 * @return 
 	 */
-	public boolean synchronize();
+	public boolean synchronize(Context context);
 	
 	/**
 	 * get all todos from Server.

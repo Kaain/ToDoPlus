@@ -105,7 +105,7 @@ public class ToDoListActivity extends ListActivity {
 			Log.i(this.getClass().toString(), "Synchronize");
 			server = new ServerCommunicationREST();
 			// TODO sync meldung an user ausgeben
-			server.synchronize();
+			server.synchronize(this);
 			
 		}
 	}
