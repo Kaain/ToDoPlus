@@ -104,6 +104,7 @@ public class ToDoListActivity extends ListActivity {
 		db.open();
 		
 		if(serverConnection){
+			Log.i(this.getClass().toString(), "Synchronize");
 			List<Todo> todoList = db.getAllTodos(null);
 			server = new ServerCommunicationREST();
 			server.synchronize(todoList);
