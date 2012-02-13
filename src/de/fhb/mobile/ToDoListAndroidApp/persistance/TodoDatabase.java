@@ -68,7 +68,10 @@ public class TodoDatabase {
 	public List<Todo> synchronize(List<Todo> todoList) throws UpdateException,
 			CreateException {
 		for (Todo t : todoList) {
-			this.updateTodo(t);
+			if (this.getTodoById(t.getId()) == null)
+				this.createTodo(t);
+			else
+				this.updateTodo(t);
 		}
 		return todoList;
 	}
